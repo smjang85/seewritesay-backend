@@ -5,11 +5,11 @@ server:
 spring:
   application:
     name: see-write-say
+
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/seewritesay
     username: postgres
-    password: postgres
+    password: ${DB_PASSWORD}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -20,14 +20,15 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: "838063875547-9ntd0gg0aboufe3bn48vbgae7kkip6po.apps.googleusercontent.com"
-            client-secret: "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"
-            redirect-uri: "https://a7a9-1-234-102-59.ngrok-free.app/login/oauth2/code/google"
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
             scope:
               - profile
               - email
@@ -39,10 +40,28 @@ spring:
             user-name-attribute: "sub"
 
 jwt:
-  secret: "yEiwBSUmy1tJG8CJvSWn6HZK9qb2DtbTjpR7EMR5AX2EYpm9sjZBxgE4+lKw3e8A3oI4+U8F1p2HuEkLIfPAXQ=="
-  validity-ms: 3600000  # 1시간
+  secret: ${JWT_SECRET}
+  validity-ms: 3600000
 
 openai:
   api:
-    key: "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"
+    key: ${OPENAI_API_KEY}
     url: "https://api.openai.com/v1/chat/completions"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  datasource:
+    url: jdbc:postgresql://db:5432/seewritesay
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/seewritesay

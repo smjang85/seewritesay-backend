@@ -1,40 +1,87 @@
+
+### 기본 도움말, 설정 ###
 HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+README.md
+.env
+.env.*
+!.env.example
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
+### 환경설정 / IDE 설정 ###
+.gradle/
+.idea/
+.vscode/
 *.iws
 *.iml
 *.ipr
+
+### 로컬 설정 / 캐시 / 로그 ###
+*.log
+*.tmp
+*.swp
+*.DS_Store
+build/
 out/
+bin/
+.sts4-cache/
+.settings/
+.springBeans
+.apt_generated
+.factorypath
+.project
+.classpath
+.nb-gradle/
+nbbuild/
+dist/
+nbdist/
+nbproject/private/
+
+### Kotlin 관련 ###
+.kotlin/
+
+### Gradle Wrapper 예외 (필요 파일만 포함) ###
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+### 빌드 결과 중 src 내부는 예외 처리 ###
+!**/src/main/**/build/
+!**/src/test/**/build/
 !**/src/main/**/out/
 !**/src/test/**/out/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+### 🔐 민감 정보 및 환경 변수 ###
+application.yml
+.env.local
+.env.production
+.env.staging
 
-### VS Code ###
-.vscode/
+### 🔐 인증/보안 관련 ###
+*.keystore
+*.jks
+*.pem
+*.p12
+*.key
+*.crt
 
-### Kotlin ###
-.kotlin
+### 🧪 테스트 관련 ###
+/test-output/
+/test-results/
+/coverage/
+/jacoco.exec
+
+### 📦 배포 결과물 ###
+*.jar
+*.war
+*.zip
+*.tar.gz
+
+### 🖥 OS 시스템 파일 ###
+Thumbs.db
+ehthumbs.db
+Icon?
+
+### 🛠 터미널 설정 ###
+*.sh~
+*.bash_history
+*.zsh_history

@@ -55,6 +55,7 @@ application.yml
 .env.local
 .env.production
 .env.staging
+.env.*
 
 ### 🔐 인증/보안 관련 ###
 *.keystore

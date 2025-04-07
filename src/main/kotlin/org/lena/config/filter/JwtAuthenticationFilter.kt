@@ -3,8 +3,8 @@ package org.lena.config.filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.lena.dto.user.CustomUser
-import org.lena.service.jwt.JwtTokenService
+import org.lena.api.dto.user.CustomUserDto
+import org.lena.domain.auth.JwtTokenService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
@@ -29,7 +29,7 @@ class JwtAuthenticationFilter(
 
             logger.info("✅ JWT 인증 성공: $email")
 
-            val user = CustomUser(
+            val user = CustomUserDto(
                 name = name ?: "사용자", // null 가능성 고려해서 기본값 설정
                 email = email
             )

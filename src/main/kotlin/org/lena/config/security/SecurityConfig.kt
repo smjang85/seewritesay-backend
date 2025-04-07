@@ -3,7 +3,7 @@ package org.lena.config.security
 import jakarta.servlet.http.HttpServletResponse
 import org.lena.config.filter.JwtAuthenticationFilter
 import org.lena.config.security.oauth2.OAuth2SuccessHandler
-import org.lena.service.jwt.JwtTokenService
+import org.lena.domain.auth.JwtTokenService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

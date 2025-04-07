@@ -86,3 +86,8 @@ Icon?
 *.sh~
 *.bash_history
 *.zsh_history
+
+.env
+.env.local
+.env.production
+.env.*

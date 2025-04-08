@@ -33,4 +33,7 @@ data class User(
 
     @Column(name = "updated_by")
     val updatedBy: String? = null
-)
+) {
+    // 기본 생성자 추가
+    constructor() : this(0, "", null, null, LocalDateTime.now(), null, null, null)
+}

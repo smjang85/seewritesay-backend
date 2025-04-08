@@ -1,5 +1,6 @@
 package org.lena.infra.user
 
+import mu.KotlinLogging
 import org.lena.api.dto.user.CustomUserDto
 import org.lena.api.dto.user.UserSettingsResponseDto
 import org.lena.domain.feedback.service.UserFeedbackService
@@ -18,16 +19,10 @@ class UserServiceImpl(
     private val imageService: ImageService
 ) : UserService {
 
+    private val logger = KotlinLogging.logger {}
+
     override fun findByEmail(email: String): User? {
         return userRepository.findByEmail(email)
-    }
-
-    override fun registerIfNotExists(email: String, name: String): User {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateLastLogin(user: User) {
-        TODO("Not yet implemented")
     }
 
     @Transactional
@@ -48,17 +43,18 @@ class UserServiceImpl(
     }
 
     override fun findById(id: Long): User {
+        logger.info( "id : $id" );
         return userRepository.findById(id).orElseThrow { IllegalArgumentException("User not found: $id") }
     }
 
-    override fun getUserSettings(user: CustomUserDto): UserSettingsResponseDto {
+    override fun getUserSettings(customUserDto: CustomUserDto): UserSettingsResponseDto {
         val maxCount = 5
-        val entity = user.entity ?: throw IllegalStateException("User 엔티티가 없습니다.")
-        val defaultImage = imageService.findById(1L);
+        val user = findById(customUserDto.id) // ✅ 여기만 수정
+        val defaultImage = imageService.findById(1L)
+        val remaining = userFeedbackService.getRemainingCount(user, defaultImage)
 
-        val remaining = userFeedbackService.getRemainingCount(entity, defaultImage)
         return UserSettingsResponseDto(
-            username = user.name,
+            username = customUserDto.name,
             maxFeedbackCount = maxCount,
             remainingFeedbackCount = remaining
         )

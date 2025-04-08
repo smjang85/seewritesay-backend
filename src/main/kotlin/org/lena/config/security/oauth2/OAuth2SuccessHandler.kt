@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication
 import mu.KLogging
 import org.lena.domain.auth.JwtTokenService
+import org.lena.domain.user.service.UserService
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
@@ -15,6 +16,7 @@ import kotlin.text.get
 @Component
 class OAuth2SuccessHandler(
     private val jwtTokenService: JwtTokenService,
+    private val userService: UserService
 ) : AuthenticationSuccessHandler {
 
     companion object : KLogging()
@@ -28,10 +30,19 @@ class OAuth2SuccessHandler(
         val email = oAuth2User.attributes["email"] as String
         val name = oAuth2User.attributes["name"] as String
 
-        val jwt = jwtTokenService.createToken(email)
-        val encodedJwt = URLEncoder.encode(jwt, StandardCharsets.UTF_8.toString())
 
-        logger.info("✅ 구글 로그인 성공: $name ($email)")
+
+        // ✅ 최종 로그인 일시 업데이트
+        val user = userService.registerOrUpdate(email, name)
+
+        logger.info("✅ 구글 로그인 성공: $user.id , name: $name ($email)")
+
+
+        val jwt = jwtTokenService.createToken(user)
+        val encodedJwt = URLEncoder.encode(jwt, StandardCharsets.UTF_8.toString())
+        logger.info("✅ jwt: $jwt")
+        logger.info("✅ encodedJwt: $encodedJwt")
+
         response.sendRedirect("seewritesay://auth/googleAuth/callback?token=$encodedJwt")
     }
 }

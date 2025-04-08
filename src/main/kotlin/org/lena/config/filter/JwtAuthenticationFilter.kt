@@ -23,13 +23,18 @@ class JwtAuthenticationFilter(
         val authHeader = request.getHeader("Authorization")
         val token = authHeader?.removePrefix("Bearer ") ?: return filterChain.doFilter(request, response)
 
+
+        logger.info("✅ JWT token: $token")
         try {
+            val id = jwtTokenService.extractId(token)
             val email = jwtTokenService.extractEmail(token)
             val name = jwtTokenService.extractName(token) // 이름도 토큰에서 추출 가능하다면
 
-            logger.info("✅ JWT 인증 성공: $email")
+            logger.info("✅ JWT 인증 성공 id: $id")
+            logger.info("✅ JWT 인증 성공: email $email")
 
             val user = CustomUserDto(
+                id = id ?: 0L,
                 name = name ?: "사용자", // null 가능성 고려해서 기본값 설정
                 email = email
             )

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/feedback")
+@RequestMapping("/api/v1/ai/feedback")
 class GptFeedbackController(
     private val gptFeedbackService: GptFeedbackService
 ) {
@@ -31,25 +31,23 @@ class GptFeedbackController(
         @AuthenticationPrincipal user: CustomUserDto?
     ) {
         if (user == null) throw RuntimeException("❌ 사용자 정보가 없습니다.")
-        logger.info { "✍️ 피드백 제출: ${request.sentence} (${user.email})" }
         gptFeedbackService.saveFeedback(user, request)
     }
 
     @GetMapping
     fun getFeedbackHistory(@AuthenticationPrincipal user: CustomUserDto?): List<Map<String, Any>> {
         if (user == null) throw RuntimeException("❌ 사용자 정보가 없습니다.")
-        logger.info { "📚 피드백 히스토리 요청: ${user.email}" }
         return gptFeedbackService.getFeedbackHistory(user)
     }
 
     @PostMapping("/generate")
     fun getFeedback(
-        authentication: Authentication,
-        @RequestBody request: Map<String, String>
+        @RequestBody request: GptFeedbackRequestDto,
+        @AuthenticationPrincipal user: CustomUserDto?
     ): GptFeedbackResponseDto {
-        val user = authentication.principal as CustomUserDto
-        val sentence = request["sentence"] ?: throw IllegalArgumentException("Missing sentence")
-        val imageId = request["imageId"] ?: "unknown"
+        if (user == null) throw RuntimeException("❌ 사용자 정보가 없습니다.")
+        val sentence = request.sentence
+        val imageId = request.imageId
 
         return gptFeedbackService.generateFeedback(user, sentence, imageId)
     }

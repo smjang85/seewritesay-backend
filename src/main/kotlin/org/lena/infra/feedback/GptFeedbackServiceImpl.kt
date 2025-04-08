@@ -34,8 +34,8 @@ class GptFeedbackServiceImpl(
         )
     }
 
-    override fun generateFeedback(user: CustomUserDto, sentence: String, imageName: String): GptFeedbackResponseDto {
-        val imageDesc = imageService.getDescriptionByImageName(imageName)
+    override fun generateFeedback(user: CustomUserDto, sentence: String, imageId: Long): GptFeedbackResponseDto {
+        val imageDesc = imageService.getDescriptionByImageId(imageId)
         logger.info { "📝 imageDesc: $imageDesc" }
 
         val gptResponse = gptClient.getFeedback(sentence, imageDesc)

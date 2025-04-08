@@ -25,8 +25,18 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/v1/auth/**","/api/v1/images/**","/images/**").permitAll()
-                    .requestMatchers("/api/v1/protected/**", "/api/v1/feedback/**").authenticated() // ✅ 수정
+                    .requestMatchers(
+                        "/api/v1/auth/**",
+                        "/api/v1/images/**",
+                        "/images/**"
+                    ).permitAll() // ✅ 비로그인 허용 경로
+
+                    .requestMatchers(
+                        "/api/v1/ai/feedback/**",
+                        "/api/v1/user/**",
+                        "/api/v1/writing/**"
+                    ).authenticated() // ✅ JWT 필요
+
                     .anyRequest().denyAll()
             }
             .oauth2Login {

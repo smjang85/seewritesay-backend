@@ -15,11 +15,11 @@ class ImageServiceImpl(
 
     private val logger = KotlinLogging.logger {}
 
-    override fun getDescriptionByImageName(imageName: String): String {
-        val image = imgInfoRepository.findByName(imageName)
-            ?: throw IllegalArgumentException("이미지 Name에 해당하는 설명을 찾을 수 없습니다: $imageName")
+    override fun getDescriptionByImageId(imageId: Long): String {
+        val image: Image = imgInfoRepository.findById(imageId)
+            .orElseThrow { IllegalStateException("존재하지 않는 이미지 ID입니다: $imageId") }
 
-        return image.description ?: throw IllegalStateException("이미지 설명이 비어 있습니다: $imageName")
+        return image.description ?: throw IllegalStateException("이미지 설명이 비어 있습니다: $imageId")
     }
 
     override fun findAll(): List<ImageResponseDto> {

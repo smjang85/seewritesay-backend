@@ -15,23 +15,26 @@ import org.lena.domain.user.entity.User
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "user_feedback", schema = "pic", uniqueConstraints = [
-    UniqueConstraint(columnNames = ["user_id", "image_id"])
-])
-data class UserFeedback(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(
+    name = "user_feedback", schema = "pic",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "image_id"])]
+)
+class UserFeedback(
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    val user: User,
+    var user: User = User(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", nullable = false)
-    val image: Image,
+    var image: Image = Image(),
 
     @Column(name = "remaining_count")
-    var remainingCount: Int? = null,
+    var remainingCount: Int? = 0,
 
     @Column(name = "created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -44,4 +47,16 @@ data class UserFeedback(
 
     @Column(name = "updated_by")
     val updatedBy: String? = null
-)
+
+) {
+    constructor() : this(
+        0,
+        User(),
+        Image(),
+        0,
+        LocalDateTime.now(),
+        null,
+        null,
+        null
+    )
+}

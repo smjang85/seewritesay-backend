@@ -20,7 +20,7 @@ class UserFeedbackServiceImpl(
     @Transactional
     override fun decrementFeedbackCount(user: User, image: Image) {
         val feedback = userFeedbackRepository.findByUserAndImage(user, image)
-            ?: UserFeedback(user = user, image = image, remainingCount = 5)
+            ?: UserFeedback.of(user = user, image = image, remainingCount = 5)
 
         val current = feedback.remainingCount ?: 0
         if (current > 0) {
@@ -32,7 +32,7 @@ class UserFeedbackServiceImpl(
     @Transactional
     override fun resetFeedbackCount(user: User, image: Image, count: Int) {
         val feedback = userFeedbackRepository.findByUserAndImage(user, image)
-            ?: UserFeedback(user = user, image = image, remainingCount = count)
+            ?: UserFeedback.of(user = user, image = image, remainingCount = count)
 
         feedback.remainingCount = count
         userFeedbackRepository.save(feedback)

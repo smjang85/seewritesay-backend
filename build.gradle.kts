@@ -39,11 +39,16 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.testcontainers:postgresql")
+
+    testImplementation("io.mockk:mockk:1.13.10") // 최신 버전 기준 (2025년 4월 기준 안정 버전)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1") // JUnit5
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.mockito") // Mockito 제외 가능
+    }
 }
 
 kotlin {

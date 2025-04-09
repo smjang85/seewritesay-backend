@@ -43,7 +43,7 @@ class HistoryWritingServiceImpl(
     override fun saveHistory(user: User, image: Image, sentence: String): HistoryWritingResponseDto {
         val category = categoryService.findById(image.categoryId)
 
-        val entity = HistoryWriting(
+        val entity = HistoryWriting.of(
             user = user,
             image = image,
             sentence = sentence,

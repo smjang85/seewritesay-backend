@@ -24,7 +24,7 @@ class UserRepositoryIntgTest {
         userRepository.deleteAll()
 
         savedUser = userRepository.save(
-            User(
+            User.of(
                 email = "test@lena.org",
                 name = "테스트 유저"
             )

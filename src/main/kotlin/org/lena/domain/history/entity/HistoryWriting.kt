@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "history_writing", schema = "pic")
-class HistoryWriting(
+class HistoryWriting private constructor(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,19 +15,19 @@ class HistoryWriting(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    val user: User = User(),
+    val user: User,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", nullable = false)
-    val image: Image = Image(),
+    val image: Image,
 
-    @Column(name = "sentence", nullable = false)
-    val sentence: String = "",
+    @Column(nullable = false)
+    val sentence: String,
 
     @Column(name = "category")
     val category: String? = null,
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "created_by")
@@ -39,6 +39,26 @@ class HistoryWriting(
     @Column(name = "updated_by")
     var updatedBy: String? = null
 ) {
+
+    companion object {
+        fun of(
+            user: User,
+            image: Image,
+            sentence: String,
+            category: String? = null,
+            createdBy: String? = null
+        ): HistoryWriting {
+            return HistoryWriting(
+                user = user,
+                image = image,
+                sentence = sentence,
+                category = category,
+                createdBy = createdBy
+            )
+        }
+    }
+
+    // JPA 기본 생성자
     constructor() : this(
         id = null,
         user = User(),

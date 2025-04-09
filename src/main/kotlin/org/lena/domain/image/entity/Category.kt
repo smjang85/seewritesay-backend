@@ -5,12 +5,14 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "categories", schema = "pic")
-data class Category(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+class Category private constructor(
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false, unique = true)
-    val name: String = "",
+    val name: String,
 
     @Column(name = "created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -23,7 +25,24 @@ data class Category(
 
     @Column(name = "updated_by")
     val updatedBy: String? = null
+
 ) {
+    companion object {
+        fun of(name: String, createdBy: String? = null): Category {
+            return Category(
+                name = name,
+                createdBy = createdBy
+            )
+        }
+    }
+
     // JPA 기본 생성자
-    constructor() : this(0, "")
+    constructor() : this(
+        id = 0,
+        name = "",
+        createdAt = LocalDateTime.now(),
+        createdBy = null,
+        updatedAt = null,
+        updatedBy = null
+    )
 }

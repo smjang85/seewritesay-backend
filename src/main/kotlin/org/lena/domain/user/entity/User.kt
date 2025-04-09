@@ -1,17 +1,14 @@
 package org.lena.domain.user.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users", schema = "pic")
-data class User(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+class User private constructor(
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false, unique = true)
@@ -33,7 +30,31 @@ data class User(
 
     @Column(name = "updated_by")
     val updatedBy: String? = null
+
 ) {
-    // 기본 생성자 추가
-    constructor() : this(0, "", null, null, LocalDateTime.now(), null, null, null)
+    companion object {
+        fun of(
+            email: String,
+            name: String? = null,
+            createdBy: String? = null
+        ): User {
+            return User(
+                email = email,
+                name = name,
+                createdBy = createdBy
+            )
+        }
+    }
+
+    // JPA 기본 생성자
+    constructor() : this(
+        id = 0,
+        email = "",
+        name = null,
+        lastLoginAt = null,
+        createdAt = LocalDateTime.now(),
+        createdBy = null,
+        updatedAt = null,
+        updatedBy = null
+    )
 }

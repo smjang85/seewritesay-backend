@@ -1,6 +1,7 @@
-package org.lena.api.controller.image
+package org.lena.domain.service.image
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.lena.api.common.dto.ApiResponse
 import org.lena.api.dto.image.CategoryResponseDto
@@ -12,12 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.transaction.annotation.Transactional
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
+@Transactional
 class CategoryControllerIntgTest {
 
     @Autowired
@@ -32,7 +35,8 @@ class CategoryControllerIntgTest {
     }
 
     @Test
-    fun `카테고리 생성 성공`() {
+    @DisplayName("createCategory_카테고리 생성 성공")
+    fun createCategory_카테고리_생성_성공() {
         val request = CategoryResponseDto(id = null, name = "여행")
 
         val response = webTestClient.post()
@@ -45,16 +49,17 @@ class CategoryControllerIntgTest {
             .returnResult()
             .responseBody
 
-        println("✅ 생성된 카테고리 응답: $response")
         assertNotNull(response)
+        assertEquals(201, response?.status)
     }
 
     @Test
-    fun `카테고리 전체 조회 성공`() {
+    @DisplayName("getAllCategories_카테고리 전체 조회 성공")
+    fun getAllCategories_카테고리_전체_조회_성공() {
         categoryRepository.saveAll(
             listOf(
-                Category.of(name = "학교"),
-                Category.of(name = "가족")
+                Category(name = "학교"),
+                Category(name = "가족")
             )
         )
 
@@ -66,7 +71,7 @@ class CategoryControllerIntgTest {
             .returnResult()
             .responseBody
 
-        println("📂 전체 카테고리 조회 응답: $response")
         assertNotNull(response)
+        assertEquals(200, response?.status)
     }
 }

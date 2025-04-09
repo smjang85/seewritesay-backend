@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException::class)
-    fun handleRuntimeException(
-        e: RuntimeException,
-        request: HttpServletRequest
+    fun handleRuntimeException(e: RuntimeException, request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
         val error = ErrorCode.INTERNAL_ERROR
         return ResponseEntity
@@ -24,9 +22,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(
-        ex: MethodArgumentNotValidException,
-        request: HttpServletRequest
+    fun handleValidationException(ex: MethodArgumentNotValidException, request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
         val errors = ex.bindingResult.fieldErrors.joinToString(", ") {
             "${it.field}: ${it.defaultMessage}"
@@ -38,9 +34,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UnauthorizedException::class)
-    fun handleUnauthorized(
-        e: UnauthorizedException,
-        request: HttpServletRequest
+    fun handleUnauthorized(e: UnauthorizedException, request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
         val error = ErrorCode.UNAUTHORIZED
         return ResponseEntity

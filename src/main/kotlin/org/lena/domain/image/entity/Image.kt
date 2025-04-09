@@ -6,7 +6,9 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "images", schema = "pic")
 data class Image(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false)
@@ -32,5 +34,24 @@ data class Image(
     @Column(name = "updated_by")
     val updatedBy: String? = null
 ) {
+    // JPA 기본 생성자
     constructor() : this(0, "", "", 0)
+
+    companion object {
+        fun of(
+            name: String,
+            path: String,
+            categoryId: Long,
+            description: String? = null,
+            createdBy: String? = null
+        ): Image {
+            return Image(
+                name = name,
+                path = path,
+                categoryId = categoryId,
+                description = description,
+                createdBy = createdBy
+            )
+        }
+    }
 }

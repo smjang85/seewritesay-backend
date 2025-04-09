@@ -10,7 +10,6 @@ import org.lena.domain.feedback.service.UserFeedbackService
 import org.lena.domain.image.service.ImageService
 import org.lena.domain.user.service.UserService
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

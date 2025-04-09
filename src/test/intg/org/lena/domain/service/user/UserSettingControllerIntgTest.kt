@@ -1,6 +1,7 @@
-package org.lena.api.controller.user
+package org.lena.domain.service.user
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.lena.domain.user.entity.User
 import org.lena.domain.user.repository.UserRepository
@@ -10,11 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.transaction.annotation.Transactional
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
+@Transactional
 class UserSettingControllerIntgTest {
 
     @Autowired
@@ -28,14 +32,15 @@ class UserSettingControllerIntgTest {
     @BeforeEach
     fun setup() {
         userRepository.deleteAll()
-        testUser = userRepository.save(User.of(email = "test@lena.org", name = "테스트유저"))
+        testUser = userRepository.save(User(email = "test@lena.org", name = "테스트유저"))
     }
 
     @Test
-    fun `사용자 설정 조회 성공`() {
+    @DisplayName("getUserSettings_사용자 설정 조회 성공")
+    fun getUserSettings_사용자_설정_조회_성공() {
         val response = webTestClient.get()
             .uri("/api/v1/user/settings")
-            .headers { it.setBasicAuth(testUser.email, "dummy") }  // 인증 헤더 세팅
+            .headers { it.setBasicAuth(testUser.email, "dummy") }
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -43,7 +48,7 @@ class UserSettingControllerIntgTest {
             .returnResult()
             .responseBody
 
-        println("⚙️ 사용자 설정 응답: $response")
         assertNotNull(response)
+        assertEquals("테스트유저", response?.get("name"))
     }
 }

@@ -34,7 +34,7 @@ class SecurityConfig(
                     .requestMatchers(
                         "/api/v1/ai/feedback/**",
                         "/api/v1/user/**",
-                        "/api/v1/writing/**"
+                        "/api/v1/history/**"
                     ).authenticated() // ✅ JWT 필요
 
                     .anyRequest().denyAll()

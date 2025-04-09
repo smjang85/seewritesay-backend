@@ -13,10 +13,12 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    ddl-auto: validate
     generate-ddl: true
     show-sql: true
     properties:
       hibernate:
+        globally_quoted_identifiers: true
         jdbc:
           lob:
             non_contextual_creation: true
@@ -47,6 +49,18 @@ openai:
   api:
     key: ${OPENAI_API_KEY}
     url: "https://api.openai.com/v1/chat/completions"
+
+logging:
+  level:
+    root: INFO
+    org.lena: DEBUG
+    org.springframework.web: WARN
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 ---
 spring:

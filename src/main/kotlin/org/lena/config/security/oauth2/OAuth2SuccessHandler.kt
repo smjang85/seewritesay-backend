@@ -35,13 +35,13 @@ class OAuth2SuccessHandler(
         // ✅ 최종 로그인 일시 업데이트
         val user = userService.registerOrUpdate(email, name)
 
-        logger.info("✅ 구글 로그인 성공: $user.id , name: $name ($email)")
+        logger.debug("✅ 구글 로그인 성공: $user.id , name: $name ($email)")
 
 
         val jwt = jwtTokenService.createToken(user)
         val encodedJwt = URLEncoder.encode(jwt, StandardCharsets.UTF_8.toString())
-        logger.info("✅ jwt: $jwt")
-        logger.info("✅ encodedJwt: $encodedJwt")
+        logger.debug("✅ jwt: $jwt")
+        logger.debug("✅ encodedJwt: $encodedJwt")
 
         response.sendRedirect("seewritesay://auth/googleAuth/callback?token=$encodedJwt")
     }

@@ -4,13 +4,14 @@ import mu.KotlinLogging
 import org.lena.api.dto.image.ImageResponseDto
 import org.lena.domain.image.repository.ImageRepository
 import org.lena.domain.image.entity.Image
-
+import org.lena.domain.image.repository.CategoryRepository
 import org.lena.domain.image.service.ImageService
 import org.springframework.stereotype.Service
 
 @Service
 class ImageServiceImpl(
-    private val imgInfoRepository: ImageRepository
+    private val imgInfoRepository: ImageRepository,
+    private val categoryRepository: CategoryRepository
 ) : ImageService {
 
     private val logger = KotlinLogging.logger {}
@@ -23,15 +24,18 @@ class ImageServiceImpl(
     }
 
     override fun findAll(): List<ImageResponseDto> {
-        val result = imgInfoRepository.findAll()
-        logger.info { "image find All : $result" }
+        val categories = categoryRepository.findAll()
+            .associateBy({ it.id }, { it.name }) // ID → 이름 맵핑
 
-        return result.map {
+        val images = imgInfoRepository.findAll()
+        logger.debug { "🖼️ 전체 이미지 수: ${images.size}" }
+
+        return images.map {
             ImageResponseDto(
                 id = it.id,
                 name = it.name,
                 path = it.path,
-                category = it.category,
+                categoryName = categories[it.categoryId], // ID → 이름 매핑된 값 사용
                 description = it.description
             )
         }

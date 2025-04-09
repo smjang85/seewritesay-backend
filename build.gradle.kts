@@ -28,6 +28,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation") // ✨ Request DTO 유효성 검증
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") // ✨ 구글 로그인 연동
     implementation("com.auth0:java-jwt:4.4.0") // JWT 발급용
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
     // 🔐 JWT 라이브러리 추가
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")

@@ -1,70 +1,79 @@
 package org.lena.api.controller.feedback
 
+import jakarta.validation.Valid
 import mu.KLogging
-import org.lena.api.dto.feedback.UserFeedbackRequest
-import org.lena.api.dto.feedback.UserFeedbackResetRequest
-import org.lena.api.dto.user.CustomUserDto
+import org.lena.api.common.dto.ApiResponse
+import org.lena.api.dto.feedback.UserFeedbackRequestDto
+import org.lena.api.dto.feedback.UserFeedbackResetRequestDto
+import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.feedback.service.UserFeedbackService
 import org.lena.domain.image.service.ImageService
-import org.lena.domain.user.entity.User
 import org.lena.domain.user.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.lena.api.common.annotation.CurrentUser
 
 @RestController
 @RequestMapping("/api/v1/user/feedback")
+@Tag(name = "사용자 피드백", description = "피드백 횟수 관리 API")
 class UserFeedbackController(
     private val imageService: ImageService,
     private val userFeedbackService: UserFeedbackService,
     private val userService: UserService
-
 ) {
-
     companion object : KLogging()
 
     @GetMapping
+    @Operation(summary = "남은 피드백 횟수 조회", description = "특정 이미지에 대해 사용자가 남은 피드백 횟수를 조회합니다.")
     fun getRemainingCount(
         @RequestParam imageId: Long,
-        @AuthenticationPrincipal user: CustomUserDto?
-    ): ResponseEntity<Map<String, Int>> {
+        @CurrentUser user: CustomUserPrincipal?
+    ): ResponseEntity<ApiResponse<Int>> {
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "➡️ [GET] Remaining Count | userId=${user.id}, imageId=$imageId" }
 
-        if (user == null) throw RuntimeException("❌ 사용자 정보가 없습니다.")
-        logger.info("user.id: $user.id");
-        logger.info("imageId: $imageId");
-
-        val user = userService.findById(user.id)
+        val foundUser = userService.findById(user.id)
         val image = imageService.findById(imageId)
-        val count = userFeedbackService.getRemainingCount(user, image)
+        val count = userFeedbackService.getRemainingCount(foundUser, image)
 
-        return ResponseEntity.ok(mapOf("remainingCount" to count))
+        return ResponseEntity.ok(ApiResponse.success(count, "남은 피드백 횟수 조회 성공"))
     }
 
     @PostMapping("/decrement")
+    @Operation(summary = "피드백 횟수 차감", description = "해당 이미지에 대한 사용자의 피드백 횟수를 1 감소시킵니다.")
     fun decrementFeedbackCount(
-        @RequestBody request: UserFeedbackRequest,
-        @AuthenticationPrincipal user: CustomUserDto?
-    ): ResponseEntity<Map<String, Int>> {
+        @RequestBody @Valid request: UserFeedbackRequestDto,
+        @CurrentUser user: CustomUserPrincipal?
+    ): ResponseEntity<ApiResponse<Int>> {
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "↘️ [POST] Decrement Feedback | userId=${user.id}, imageId=${request.imageId}" }
 
-        if (user == null) throw RuntimeException("❌ 사용자 정보가 없습니다.")
-        val user = userService.findById(user.id)
-
+        val foundUser = userService.findById(user.id)
         val image = imageService.findById(request.imageId)
-        userFeedbackService.decrementFeedbackCount(user!!, image)
-        val updated = userFeedbackService.getRemainingCount(user, image)
-        return ResponseEntity.ok(mapOf("remainingCount" to updated))
+
+        userFeedbackService.decrementFeedbackCount(foundUser, image)
+        val updated = userFeedbackService.getRemainingCount(foundUser, image)
+
+        return ResponseEntity.ok(ApiResponse.success(updated, "피드백 횟수 차감 완료"))
     }
 
     @PostMapping("/reset")
+    @Operation(summary = "피드백 횟수 초기화", description = "사용자의 특정 이미지에 대한 피드백 횟수를 원하는 값으로 초기화합니다.")
     fun resetFeedbackCount(
-        @RequestBody request: UserFeedbackResetRequest,
-        @AuthenticationPrincipal user: CustomUserDto?
-    ): ResponseEntity<Map<String, Int>> {
+        @RequestBody @Valid request: UserFeedbackResetRequestDto,
+        @CurrentUser user: CustomUserPrincipal?
+    ): ResponseEntity<ApiResponse<Int>> {
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "🔁 [POST] Reset Feedback | userId=${user.id}, imageId=${request.imageId}, count=${request.count}" }
 
-        if (user == null) throw RuntimeException("❌ 사용자 정보가 없습니다.")
-        val user = userService.findById(user.id)
+        val foundUser = userService.findById(user.id)
         val image = imageService.findById(request.imageId)
-        userFeedbackService.resetFeedbackCount(user, image, request.count)
-        return ResponseEntity.ok(mapOf("remainingCount" to request.count))
+
+        userFeedbackService.resetFeedbackCount(foundUser, image, request.count)
+
+        return ResponseEntity.ok(ApiResponse.success(request.count, "피드백 횟수 초기화 완료"))
     }
 }

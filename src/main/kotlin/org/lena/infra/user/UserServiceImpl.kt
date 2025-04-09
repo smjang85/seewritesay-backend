@@ -1,7 +1,7 @@
 package org.lena.infra.user
 
 import mu.KotlinLogging
-import org.lena.api.dto.user.CustomUserDto
+import org.lena.config.security.CustomUserPrincipal
 import org.lena.api.dto.user.UserSettingsResponseDto
 import org.lena.domain.feedback.service.UserFeedbackService
 import org.lena.domain.image.service.ImageService
@@ -43,11 +43,11 @@ class UserServiceImpl(
     }
 
     override fun findById(id: Long): User {
-        logger.info( "id : $id" );
+        logger.debug( "id : $id" );
         return userRepository.findById(id).orElseThrow { IllegalArgumentException("User not found: $id") }
     }
 
-    override fun getUserSettings(customUserDto: CustomUserDto): UserSettingsResponseDto {
+    override fun getUserSettings(customUserDto: CustomUserPrincipal): UserSettingsResponseDto {
         val maxCount = 5
         val user = findById(customUserDto.id) // ✅ 여기만 수정
         val defaultImage = imageService.findById(1L)

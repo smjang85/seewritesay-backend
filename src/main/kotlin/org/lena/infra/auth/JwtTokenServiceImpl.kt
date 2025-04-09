@@ -30,7 +30,7 @@ class JwtTokenServiceImpl : JwtTokenService {
         val validity = Date(now.time + validityInMilliseconds)
 
         val secretKey: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyString))
-        logger.info("createToken user.id $user.id" )
+        logger.debug("createToken user.id $user.id" )
         return Jwts.builder()
             .setSubject(user.email) // 기본 subject는 email
             .setIssuedAt(now)

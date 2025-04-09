@@ -1,11 +1,6 @@
 package org.lena.domain.image.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
@@ -20,7 +15,8 @@ data class Image(
     @Column(nullable = false)
     val path: String = "",
 
-    val category: String? = null,
+    @Column(name = "category_id", nullable = false)
+    val categoryId: Long = 0,
 
     val description: String? = null,
 
@@ -36,6 +32,5 @@ data class Image(
     @Column(name = "updated_by")
     val updatedBy: String? = null
 ) {
-    // JPA 기본 생성자
-    constructor() : this(0, "", "")
+    constructor() : this(0, "", "", 0)
 }

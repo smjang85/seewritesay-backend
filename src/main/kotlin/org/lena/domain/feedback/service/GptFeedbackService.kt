@@ -1,11 +1,8 @@
 package org.lena.domain.feedback.service
 
-import org.lena.api.dto.feedback.GptFeedbackRequestDto
 import org.lena.api.dto.feedback.GptFeedbackResponseDto
-import org.lena.api.dto.user.CustomUserDto
+import org.lena.config.security.CustomUserPrincipal
 
 interface GptFeedbackService {
-    fun saveFeedback(user: CustomUserDto, request: GptFeedbackRequestDto)
-    fun getFeedbackHistory(user: CustomUserDto): List<Map<String, Any>>
-    fun generateFeedback(user: CustomUserDto, sentence: String, imageId: Long): GptFeedbackResponseDto
+    fun generateFeedback(user: CustomUserPrincipal, sentence: String, imageId: Long): GptFeedbackResponseDto
 }

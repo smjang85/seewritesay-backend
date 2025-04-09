@@ -91,3 +91,5 @@ Icon?
 .env.local
 .env.production
 .env.*
+
+application-test.yml

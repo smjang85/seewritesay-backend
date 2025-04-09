@@ -32,7 +32,7 @@ class UserSettingControllerIntgTest {
     @BeforeEach
     fun setup() {
         userRepository.deleteAll()
-        testUser = userRepository.save(User(email = "test@lena.org", name = "테스트유저"))
+        testUser = userRepository.save(User.of(email = "test@lena.org", name = "테스트유저"))
     }
 
     @Test
@@ -49,6 +49,6 @@ class UserSettingControllerIntgTest {
             .responseBody
 
         assertNotNull(response)
-        assertEquals("테스트유저", response?.get("name"))
+        assertEquals("테스트유저", response["name"])
     }
 }

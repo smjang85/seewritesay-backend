@@ -58,8 +58,8 @@ class CategoryControllerIntgTest {
     fun getAllCategories_카테고리_전체_조회_성공() {
         categoryRepository.saveAll(
             listOf(
-                Category(name = "학교"),
-                Category(name = "가족")
+                Category.of(name = "학교"),
+                Category.of(name = "가족")
             )
         )
 

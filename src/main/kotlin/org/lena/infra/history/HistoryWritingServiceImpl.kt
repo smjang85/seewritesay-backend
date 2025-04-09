@@ -19,9 +19,9 @@ class HistoryWritingServiceImpl(
 
     override fun getHistory(user: User, imageId: Long?): List<HistoryWritingResponseDto> {
         val histories = if (imageId != null) {
-            historyWritingRepository.findAllByUserIdAndImageId(user.id!!, imageId)
+            historyWritingRepository.findAllByUserIdAndImageId(user.id, imageId)
         } else {
-            historyWritingRepository.findAllByUserId(user.id!!)
+            historyWritingRepository.findAllByUserId(user.id)
         }
 
         return histories.map {

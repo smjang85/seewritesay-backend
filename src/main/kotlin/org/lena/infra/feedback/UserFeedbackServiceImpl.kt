@@ -22,7 +22,7 @@ class UserFeedbackServiceImpl(
         val feedback = userFeedbackRepository.findByUserAndImage(user, image)
             ?: UserFeedback.of(user = user, image = image, remainingCount = 5)
 
-        val current = feedback.remainingCount ?: 0
+        val current = feedback.remainingCount
         if (current > 0) {
             feedback.remainingCount = current - 1
             userFeedbackRepository.save(feedback)

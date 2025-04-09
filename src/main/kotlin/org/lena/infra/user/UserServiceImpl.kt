@@ -32,7 +32,7 @@ class UserServiceImpl(
             user.lastLoginAt = LocalDateTime.now()
             userRepository.save(user)
         } else {
-            val newUser = User(
+            val newUser = User.of(
                 email = email,
                 name = name,
                 lastLoginAt = LocalDateTime.now(),

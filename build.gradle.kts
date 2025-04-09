@@ -65,7 +65,7 @@ tasks.withType<Test> {
 sourceSets {
     test {
         java {
-            setSrcDirs(listOf("src/test/intg", "src/test/unit"))
+            java.setSrcDirs(listOf("src/test/kotlin"))
         }
     }
 }

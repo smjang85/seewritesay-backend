@@ -7,7 +7,7 @@ object UserFixture {
         name: String = "테스트유저",
         email: String = "test@example.com"
     ): User {
-        return User(
+        return User.of(
             name = name,
             email = email
         )

@@ -36,11 +36,13 @@ class User private constructor(
         fun of(
             email: String,
             name: String? = null,
+            lastLoginAt: LocalDateTime? = null,
             createdBy: String? = null
         ): User {
             return User(
                 email = email,
                 name = name,
+                lastLoginAt = lastLoginAt,
                 createdBy = createdBy
             )
         }

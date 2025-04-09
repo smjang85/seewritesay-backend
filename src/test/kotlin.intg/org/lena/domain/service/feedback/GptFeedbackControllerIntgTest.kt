@@ -40,7 +40,7 @@ class GptFeedbackControllerIntgTest {
 
     @BeforeEach
     fun setup() {
-        testUser = userRepository.save(User(email = "test@example.com", name = "테스트유저"))
+        testUser = userRepository.save(User.of(email = "test@example.com", name = "테스트유저"))
         testImage = imageRepository.save(
             Image(
                 name = "샘플 이미지",

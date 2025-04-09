@@ -14,6 +14,13 @@ java {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+
+    // 🔽 이 줄 추가
+    include("**/*Test.class")
+}
+
 repositories {
     mavenCentral()
 }
@@ -39,6 +46,9 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
+    testImplementation("net.java.dev.jna:jna:5.13.0")
+    testImplementation("net.java.dev.jna:jna-platform:5.13.0")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -47,7 +57,8 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.10") // 최신 버전 기준 (2025년 4월 기준 안정 버전)
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1") // JUnit5
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.mockito") // Mockito 제외 가능
+        exclude(group = "org.mockito")
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine") // ✅ vintage 엔진 제거
     }
 }
 
@@ -62,10 +73,15 @@ tasks.withType<Test> {
 }
 
 
+
 sourceSets {
     test {
+        // after 7.1
+
         java {
-            java.setSrcDirs(listOf("src/test/kotlin"))
+            setSrcDirs(listOf("src/test/intg", "src/test//unit"))
         }
+
+
     }
 }

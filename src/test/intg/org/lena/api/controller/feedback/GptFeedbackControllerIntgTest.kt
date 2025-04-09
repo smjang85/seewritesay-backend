@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.lena.api.common.dto.ApiResponse
 import org.lena.api.dto.feedback.GptFeedbackRequestDto
-import org.lena.api.dto.feedback.GptFeedbackResponseDto
 import org.lena.domain.image.entity.Image
 import org.lena.domain.image.repository.ImageRepository
 import org.lena.domain.user.entity.User
@@ -12,7 +11,6 @@ import org.lena.domain.user.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient

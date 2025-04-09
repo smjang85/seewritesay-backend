@@ -1,5 +1,6 @@
 package org.lena.infra.feedback
 
+import org.lena.api.dto.feedback.UserFeedbackResponseDto
 import org.lena.domain.feedback.entity.UserFeedback
 import org.lena.domain.feedback.repository.UserFeedbackRepository
 import org.lena.domain.feedback.service.UserFeedbackService
@@ -13,8 +14,9 @@ class UserFeedbackServiceImpl(
     private val userFeedbackRepository: UserFeedbackRepository
 ) : UserFeedbackService {
 
-    override fun getRemainingCount(user: User, image: Image): Int {
-        return userFeedbackRepository.findByUserAndImage(user, image)?.remainingCount ?: 5
+    override fun getRemainingCount(user: User, image: Image): UserFeedbackResponseDto {
+        val remainingCount = userFeedbackRepository.findByUserAndImage(user, image)?.remainingCount ?: 5
+        return UserFeedbackResponseDto(remainingCount = remainingCount)
     }
 
     @Transactional

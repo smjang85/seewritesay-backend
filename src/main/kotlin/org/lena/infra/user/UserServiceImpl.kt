@@ -1,5 +1,6 @@
 package org.lena.infra.user
 
+
 import mu.KotlinLogging
 import org.lena.config.security.CustomUserPrincipal
 import org.lena.api.dto.user.UserSettingsResponseDto
@@ -51,12 +52,12 @@ class UserServiceImpl(
         val maxCount = 5
         val user = findById(customUserDto.id) // ✅ 여기만 수정
         val defaultImage = imageService.findById(1L)
-        val remaining = userFeedbackService.getRemainingCount(user, defaultImage)
+        val userFeedbackResponseDto = userFeedbackService.getRemainingCount(user, defaultImage)
 
         return UserSettingsResponseDto(
             username = customUserDto.name,
             maxFeedbackCount = maxCount,
-            remainingFeedbackCount = remaining
+            remainingFeedbackCount = userFeedbackResponseDto.remainingCount
         )
     }
 }

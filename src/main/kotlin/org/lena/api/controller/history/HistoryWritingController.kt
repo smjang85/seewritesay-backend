@@ -39,14 +39,14 @@ class HistoryWritingController(
     fun getHistory(
         @Parameter(description = "이미지 ID (선택)") @RequestParam(required = false) imageId: Long?,
         @CurrentUser user: CustomUserPrincipal?
-    ): ApiResponse<List<HistoryWritingResponseDto>> {
+    ): ResponseEntity<ApiResponse<List<HistoryWritingResponseDto>>?> {
         requireNotNull(user) { "사용자 정보가 없습니다." }
         logger.debug { "GET /history/writing | userId=${user.id}, imageId=$imageId" }
 
         val foundUser = userService.findById(user.id)
         val response = writingHistoryService.getHistory(foundUser, imageId)
 
-        return ApiResponse.Companion.success(response, "작문 히스토리 조회 성공")
+        return ResponseEntity.ok(ApiResponse.Companion.success(response, "작문 히스토리 조회 성공"))
     }
 
     @Operation(summary = "작문 히스토리 저장", description = "사용자가 입력한 문장을 특정 이미지에 연결하여 작문 히스토리를 저장합니다.")
@@ -55,7 +55,7 @@ class HistoryWritingController(
     fun saveHistory(
         @RequestBody @Valid request: HistoryWritingRequestDto,
         @CurrentUser user: CustomUserPrincipal?
-    ): ResponseEntity<ApiResponse<HistoryWritingResponseDto>> {
+    ){
         requireNotNull(user) { "사용자 정보가 없습니다." }
         logger.debug { "POST /history/writing | userId=${user.id}, imageId=${request.imageId}" }
 
@@ -64,8 +64,6 @@ class HistoryWritingController(
         val response = writingHistoryService.saveHistory(foundUser, image, request.sentence)
 
         logger.debug { "POST /history/writing | response : ${response}" }
-
-        return ResponseEntity.ok(ApiResponse.Companion.created(response, "작문 히스토리 저장 완료"))
     }
 
     @Operation(summary = "카테고리별 히스토리 조회", description = "사용자의 작문 히스토리를 카테고리 기준으로 그룹화하여 조회합니다.")
@@ -88,13 +86,11 @@ class HistoryWritingController(
     fun deleteHistory(
         @Parameter(description = "삭제할 히스토리 ID") @RequestParam id: Long,
         @CurrentUser user: CustomUserPrincipal?
-    ): ResponseEntity<ApiResponse<Void>> {
+    ){
         requireNotNull(user) { "사용자 정보가 없습니다." }
         logger.debug { "DELETE /history/writing | userId=${user.id}, historyId=$id" }
 
         val foundUser = userService.findById(user.id)
         writingHistoryService.deleteHistoryById(foundUser, id)
-
-        return ResponseEntity.noContent().build()
     }
 }

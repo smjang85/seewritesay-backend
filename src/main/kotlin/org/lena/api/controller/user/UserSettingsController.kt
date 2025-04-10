@@ -10,6 +10,7 @@ import org.lena.api.common.annotation.CurrentUser
 import org.lena.api.dto.user.UserSettingsResponseDto
 import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.user.service.UserService
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -39,9 +40,9 @@ class UserSettingsController(
         ]
     )
     @GetMapping("/settings")
-    fun getUserSettings(@CurrentUser user: CustomUserPrincipal?): UserSettingsResponseDto {
+    fun getUserSettings(@CurrentUser user: CustomUserPrincipal?): ResponseEntity<UserSettingsResponseDto?> {
         if (user == null) throw RuntimeException("사용자 정보가 없습니다.")
         logger.debug { "GET /user/settings | userId=${user.id}" }
-        return userService.getUserSettings(user)
+        return ResponseEntity.ok(userService.getUserSettings(user))
     }
 }

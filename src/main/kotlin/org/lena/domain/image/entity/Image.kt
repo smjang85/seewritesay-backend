@@ -20,6 +20,7 @@ data class Image(
     @Column(name = "category_id", nullable = false)
     val categoryId: Long = 0,
 
+    @Column(name = "description", length = 1000)
     val description: String? = null,
 
     @Column(name = "created_at")

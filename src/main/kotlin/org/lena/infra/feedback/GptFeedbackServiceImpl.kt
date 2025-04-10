@@ -23,12 +23,7 @@ class GptFeedbackServiceImpl(
         val gptResponse = gptFeedbackClient.getFeedback(sentence, imageDesc)
         logger.debug { "GptFeedbackServiceImpl>generateFeedback GPT 응답: $gptResponse" }
 
-        val correctionLine = gptResponse.lines().find { it.startsWith("Correction:") }?.removePrefix("Correction:")?.trim()
-        val feedbackLine = gptResponse.lines().find { it.startsWith("Feedback:") }?.removePrefix("Feedback:")?.trim()
 
-        return GptFeedbackResponseDto(
-            correction = correctionLine ?: sentence,
-            feedback = feedbackLine ?: ""
-        )
+        return gptResponse
     }
 }

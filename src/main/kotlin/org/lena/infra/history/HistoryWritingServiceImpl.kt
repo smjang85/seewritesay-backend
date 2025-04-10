@@ -1,5 +1,7 @@
 package org.lena.infra.history
 
+import mu.KLogging
+import mu.KotlinLogging
 import org.lena.api.dto.history.HistoryWritingResponseDto
 import org.lena.domain.image.entity.Image
 import org.lena.domain.user.entity.User
@@ -16,6 +18,9 @@ class HistoryWritingServiceImpl(
     private val historyWritingRepository: HistoryWritingRepository,
     private val categoryService: CategoryService,
 ) : HistoryWritingService {
+
+
+    companion object : KLogging()
 
     override fun getHistory(user: User, imageId: Long?): List<HistoryWritingResponseDto> {
         val histories = if (imageId != null) {
@@ -43,14 +48,28 @@ class HistoryWritingServiceImpl(
     override fun saveHistory(user: User, image: Image, sentence: String): HistoryWritingResponseDto {
         val category = categoryService.findById(image.categoryId)
 
-        val entity = HistoryWriting.of(
-            user = user,
-            image = image,
-            sentence = sentence,
-            category = category?.name,
-            createdBy = user.id.toString()
-        )
-        val saved = historyWritingRepository.save(entity)
+        // 기존 히스토리 존재 여부 확인
+        val existing = historyWritingRepository.findByUserIdAndImageId(user.id, image.id)
+
+        logger.debug{"existing : $existing"}
+        val saved = if (existing != null) {
+            existing.updateSentence(sentence, user.id.toString())
+
+            logger.debug{"updateSentence : $existing"}
+
+            historyWritingRepository.save(existing)
+        } else {
+            val entity = HistoryWriting.of(
+                user = user,
+                image = image,
+                sentence = sentence,
+                category = category?.name,
+                createdBy = user.id.toString()
+            )
+
+            logger.debug{"insert existing : $existing"}
+            historyWritingRepository.save(entity)
+        }
 
         return HistoryWritingResponseDto(
             id = saved.id!!,
@@ -64,6 +83,8 @@ class HistoryWritingServiceImpl(
             createdAt = saved.createdAt
         )
     }
+
+
 
     override fun getUserHistoryWithCategory(user: User): List<HistoryWritingResponseDto> {
         val historyList = historyWritingRepository.findAllByUserId(user.id)
@@ -83,5 +104,12 @@ class HistoryWritingServiceImpl(
                 createdAt = history.createdAt
             )
         }
+    }
+
+
+    override fun deleteHistoryById(user: User, historyId: Long) {
+        val historyWriting: HistoryWriting = historyWritingRepository.findByIdAndUser(historyId, user)
+            ?: throw IllegalArgumentException("해당 히스토리를 찾을 수 없습니다.")
+        historyWritingRepository.delete(historyWriting)
     }
 }

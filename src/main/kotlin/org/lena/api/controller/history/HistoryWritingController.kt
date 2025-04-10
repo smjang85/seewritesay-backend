@@ -13,12 +13,15 @@ import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.history.service.HistoryWritingService
 import org.lena.domain.image.service.ImageService
 import org.lena.domain.user.service.UserService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "Writing History", description = "작문 히스토리 관련 API")
@@ -48,6 +51,7 @@ class HistoryWritingController(
 
     @Operation(summary = "작문 히스토리 저장", description = "사용자가 입력한 문장을 특정 이미지에 연결하여 작문 히스토리를 저장합니다.")
     @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun saveHistory(
         @RequestBody @Valid request: HistoryWritingRequestDto,
         @CurrentUser user: CustomUserPrincipal?
@@ -58,6 +62,8 @@ class HistoryWritingController(
         val foundUser = userService.findById(user.id)
         val image = imageService.findById(request.imageId)
         val response = writingHistoryService.saveHistory(foundUser, image, request.sentence)
+
+        logger.debug { "POST /history/writing | response : ${response}" }
 
         return ResponseEntity.ok(ApiResponse.Companion.created(response, "작문 히스토리 저장 완료"))
     }
@@ -74,5 +80,21 @@ class HistoryWritingController(
         val response = writingHistoryService.getUserHistoryWithCategory(foundUser)
 
         return ResponseEntity.ok(ApiResponse.Companion.success(response, "카테고리별 작문 히스토리 조회 성공"))
+    }
+
+    @Operation(summary = "작문 히스토리 삭제", description = "작문 히스토리 항목을 삭제합니다.")
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteHistory(
+        @Parameter(description = "삭제할 히스토리 ID") @RequestParam id: Long,
+        @CurrentUser user: CustomUserPrincipal?
+    ): ResponseEntity<ApiResponse<Void>> {
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "DELETE /history/writing | userId=${user.id}, historyId=$id" }
+
+        val foundUser = userService.findById(user.id)
+        writingHistoryService.deleteHistoryById(foundUser, id)
+
+        return ResponseEntity.noContent().build()
     }
 }

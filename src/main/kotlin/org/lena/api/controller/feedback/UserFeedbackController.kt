@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus
 @RestController
 @RequestMapping("/api/v1/user/feedback")
 @Tag(name = "사용자 피드백", description = "피드백 횟수 관리 API")
-class UserFeedbackController(
+class aUserFeedbackController(
     private val imageService: ImageService,
     private val userFeedbackService: UserFeedbackService,
     private val userService: UserService

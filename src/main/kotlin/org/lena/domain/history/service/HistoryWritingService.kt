@@ -8,4 +8,5 @@ interface HistoryWritingService {
     fun saveHistory(user: User, image: Image, sentence: String): HistoryWritingResponseDto
     fun getHistory(user: User, imageId: Long?): List<HistoryWritingResponseDto>
     fun getUserHistoryWithCategory(user: User): List<HistoryWritingResponseDto>
+    fun deleteHistoryById(user: User, historyId: Long)
 }

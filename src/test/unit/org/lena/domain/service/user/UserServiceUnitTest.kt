@@ -7,6 +7,7 @@ import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.lena.api.dto.feedback.UserFeedbackResponseDto
 import org.lena.api.dto.user.UserSettingsResponseDto
 import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.feedback.service.UserFeedbackService
@@ -91,9 +92,11 @@ class UserServiceUnitTest {
     fun getUserSettings_성공() {
         val principal = CustomUserPrincipal(id = 1L, email = "test@lena.org", name = "테스트유저")
 
+        val mockResponse = UserFeedbackResponseDto(remainingCount = 3)
+
         every { userRepository.findById(1L) } returns Optional.of(dummyUser)
         every { imageService.findById(1L) } returns dummyImage
-        every { userFeedbackService.getRemainingCount(dummyUser, dummyImage) } returns 3
+        every { userFeedbackService.getRemainingCount(dummyUser, dummyImage) } returns mockResponse
 
         val result: UserSettingsResponseDto = userService.getUserSettings(principal)
 

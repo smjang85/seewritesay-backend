@@ -4,6 +4,7 @@ import io.mockk.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.lena.api.dto.feedback.UserFeedbackResponseDto
 import org.lena.domain.feedback.entity.UserFeedback
 import org.lena.domain.feedback.repository.UserFeedbackRepository
 import org.lena.domain.image.entity.Image
@@ -32,7 +33,9 @@ class UserFeedbackServiceUnitTest {
 
         val count = userFeedbackService.getRemainingCount(user, image)
 
-        assertEquals(5, count)
+        val mockResponse = UserFeedbackResponseDto(remainingCount = 5)
+
+        assertEquals(mockResponse, count)
     }
 
     @Test
@@ -43,7 +46,9 @@ class UserFeedbackServiceUnitTest {
 
         val count = userFeedbackService.getRemainingCount(user, image)
 
-        assertEquals(3, count)
+        val mockResponse = UserFeedbackResponseDto(remainingCount = 3)
+
+        assertEquals(mockResponse, count)
     }
 
     @Test

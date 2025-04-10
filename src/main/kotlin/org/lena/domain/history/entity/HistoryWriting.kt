@@ -22,7 +22,7 @@ class HistoryWriting private constructor(
     val image: Image,
 
     @Column(nullable = false)
-    val sentence: String,
+    var sentence: String,
 
     @Column(name = "category")
     val category: String? = null,
@@ -70,4 +70,11 @@ class HistoryWriting private constructor(
         updatedAt = null,
         updatedBy = null
     )
+
+    fun updateSentence(newSentence: String, updatedBy: String) {
+        if (this.sentence == newSentence) return
+        this.sentence = newSentence
+        this.updatedAt = LocalDateTime.now()
+        this.updatedBy = updatedBy
+    }
 }

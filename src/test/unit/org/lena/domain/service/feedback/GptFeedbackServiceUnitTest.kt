@@ -11,6 +11,7 @@ import org.lena.infra.feedback.GptFeedbackServiceImpl
 import org.lena.infra.feedback.client.GptFeedbackClient
 import org.lena.domain.image.service.ImageService
 import kotlin.test.assertEquals
+import org.lena.api.dto.feedback.GptFeedbackResponseDto
 
 class GptFeedbackServiceUnitTest {
 
@@ -35,10 +36,11 @@ class GptFeedbackServiceUnitTest {
         val sentence = "This is test."
         val imageId = 100L
         val imageDescription = "A boy playing in the park"
-        val gptMockResponse = """
-            Correction: This is a test.
-            Feedback: Great try! Just remember to use 'a' before test.
-        """.trimIndent()
+        val gptMockResponse = GptFeedbackResponseDto(
+            correction = "This is a test.",
+            feedback = "Great try! Just remember to use 'a' before test.",
+            grade = "B"
+        )
 
         every { imageService.getDescriptionByImageId(imageId) } returns imageDescription
         every { gptFeedbackClient.getFeedback(sentence, imageDescription) } returns gptMockResponse
@@ -49,7 +51,9 @@ class GptFeedbackServiceUnitTest {
         // then
         assertEquals("This is a test.", result.correction)
         assertEquals("Great try! Just remember to use 'a' before test.", result.feedback)
+        assertEquals("B", result.grade)
     }
+
 
     @Test
     @DisplayName("generateFeedback - GPT 응답이 포맷을 따르지 않을 경우 기본값 반환")
@@ -57,13 +61,19 @@ class GptFeedbackServiceUnitTest {
         val sentence = "This is weird."
         val imageId = 101L
         val imageDescription = "An empty beach"
+        val fallbackResponse = GptFeedbackResponseDto(
+            correction = sentence,
+            feedback = "",
+            grade = "F"
+        )
 
         every { imageService.getDescriptionByImageId(imageId) } returns imageDescription
-        every { gptFeedbackClient.getFeedback(sentence, imageDescription) } returns "Unstructured GPT response"
+        every { gptFeedbackClient.getFeedback(sentence, imageDescription) } returns fallbackResponse
 
         val result = gptFeedbackService.generateFeedback(dummyUser, sentence, imageId)
 
         assertEquals(sentence, result.correction)
         assertEquals("", result.feedback)
+        assertEquals("F", result.grade)
     }
 }

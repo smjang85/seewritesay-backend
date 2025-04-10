@@ -32,6 +32,7 @@ class SecurityConfig(
                     ).permitAll() // ✅ 비로그인 허용 경로
 
                     .requestMatchers(
+                        "/",
                         "/api/v1/ai/feedback/**",
                         "/api/v1/user/**",
                         "/api/v1/history/**"

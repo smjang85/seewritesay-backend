@@ -1,9 +1,6 @@
 version: '3.8'
 
 services:
-  backend:
-    env_file:
-      - .env
   db:
     image: postgres:15
     container_name: postgres
@@ -27,12 +24,16 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=local
-      - DB_PASSWORD=${DB_PASSWORD}  # 로컬 환경변수 사용
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}  # 로컬 환경변수 사용
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}  # 로컬 환경변수 사용
-      - JWT_SECRET=${JWT_SECRET}  # 로컬 환경변수 사용
-      - OPENAI_API_KEY=${OPENAI_API_KEY}  # 로컬 환경변수 사용
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DATASOURCE_URL=${DATASOURCE_URL}
+      - DATASOURCE_DRIVER_CLASSNAME=${DATASOURCE_DRIVER_CLASSNAME}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
 
 volumes:
   pgdata:

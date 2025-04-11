@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_DB: seewritesay
-      POSTGRES_USER: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}  # 로컬 환경변수 사용
     ports:
       - "5432:5432"
@@ -29,6 +27,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DATASOURCE_URL=${DATASOURCE_URL}
       - DATASOURCE_DRIVER_CLASSNAME=${DATASOURCE_DRIVER_CLASSNAME}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - DATABASE-PLATFORM=${DATABASE-PLATFORM}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}

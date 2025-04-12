@@ -2,6 +2,7 @@ package org.lena.infra.history
 
 import mu.KLogging
 import mu.KotlinLogging
+import org.lena.api.dto.history.HistoryWritingRequestDto
 import org.lena.api.dto.history.HistoryWritingResponseDto
 import org.lena.domain.image.entity.Image
 import org.lena.domain.user.entity.User
@@ -10,7 +11,6 @@ import org.lena.domain.history.repository.HistoryWritingRepository
 import org.lena.domain.history.service.HistoryWritingService
 import org.lena.domain.image.service.CategoryService
 import org.springframework.stereotype.Service
-import kotlin.String
 
 
 @Service
@@ -45,7 +45,7 @@ class HistoryWritingServiceImpl(
         }
     }
 
-    override fun saveHistory(user: User, image: Image, sentence: String): HistoryWritingResponseDto {
+    override fun saveHistory(user: User, image: Image, historyWritingRequestDto: HistoryWritingRequestDto): HistoryWritingResponseDto {
         val category = categoryService.findById(image.categoryId)
 
         // 기존 히스토리 존재 여부 확인
@@ -53,7 +53,7 @@ class HistoryWritingServiceImpl(
 
         logger.debug{"existing : $existing"}
         val saved = if (existing != null) {
-            existing.updateSentence(sentence, user.id.toString())
+            existing.updateSentence(historyWritingRequestDto.sentence, historyWritingRequestDto.grade, user.id.toString())
 
             logger.debug{"updateSentence : $existing"}
 
@@ -62,7 +62,8 @@ class HistoryWritingServiceImpl(
             val entity = HistoryWriting.of(
                 user = user,
                 image = image,
-                sentence = sentence,
+                sentence = historyWritingRequestDto.sentence,
+                grade = historyWritingRequestDto.grade,
                 category = category?.name,
                 createdBy = user.id.toString()
             )

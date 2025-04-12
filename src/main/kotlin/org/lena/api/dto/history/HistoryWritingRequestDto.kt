@@ -9,5 +9,9 @@ data class HistoryWritingRequestDto(
     val imageId: Long,
 
     @field:NotBlank(message = "문장은 비어 있을 수 없습니다.")
-    val sentence: String
+    val sentence: String,
+
+    @field:NotBlank(message = "등급은 비어 있을 수 없습니다.")
+    val grade: String,
+
 )

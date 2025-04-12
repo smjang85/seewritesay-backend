@@ -61,7 +61,7 @@ class HistoryWritingController(
 
         val foundUser = userService.findById(user.id)
         val image = imageService.findById(request.imageId)
-        val response = writingHistoryService.saveHistory(foundUser, image, request.sentence)
+        val response = writingHistoryService.saveHistory(foundUser, image, request)
 
         logger.debug { "POST /history/writing | response : ${response}" }
     }

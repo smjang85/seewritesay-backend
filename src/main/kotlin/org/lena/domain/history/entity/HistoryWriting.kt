@@ -24,6 +24,9 @@ class HistoryWriting private constructor(
     @Column(nullable = false)
     var sentence: String,
 
+    @Column(nullable = false)
+    var grade: String,
+
     @Column(name = "category")
     val category: String? = null,
 
@@ -45,6 +48,7 @@ class HistoryWriting private constructor(
             user: User,
             image: Image,
             sentence: String,
+            grade: String,
             category: String? = null,
             createdBy: String? = null
         ): HistoryWriting {
@@ -52,6 +56,7 @@ class HistoryWriting private constructor(
                 user = user,
                 image = image,
                 sentence = sentence,
+                grade = grade,
                 category = category,
                 createdBy = createdBy
             )
@@ -64,6 +69,7 @@ class HistoryWriting private constructor(
         user = User(),
         image = Image(),
         sentence = "",
+        grade = "",
         category = null,
         createdAt = LocalDateTime.now(),
         createdBy = null,
@@ -71,10 +77,12 @@ class HistoryWriting private constructor(
         updatedBy = null
     )
 
-    fun updateSentence(newSentence: String, updatedBy: String) {
+    fun updateSentence(newSentence: String, newGrade: String, updatedBy: String) {
         if (this.sentence == newSentence) return
+        this.grade = newGrade
         this.sentence = newSentence
         this.updatedAt = LocalDateTime.now()
         this.updatedBy = updatedBy
     }
+
 }

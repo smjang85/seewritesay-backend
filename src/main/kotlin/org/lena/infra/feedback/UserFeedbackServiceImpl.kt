@@ -15,7 +15,7 @@ class UserFeedbackServiceImpl(
 ) : UserFeedbackService {
 
     override fun getRemainingCount(user: User, image: Image): UserFeedbackResponseDto {
-        val remainingCount = userFeedbackRepository.findByUserAndImage(user, image)?.remainingCount ?: 5
+        val remainingCount = userFeedbackRepository.findByUserAndImage(user, image)?.remainingCount ?: 30
         return UserFeedbackResponseDto(remainingCount = remainingCount)
     }
 

@@ -4,13 +4,13 @@ services:
     container_name: ${DOCKER_DB_CONTAINER_NAME}
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: ${DOCKER_DB_POSTGRES_DBNAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - ${DOCKER_DB_POSTGRES_PORT}
     volumes:
-      - ${POSTGRES_VOLUMES}
+      - ${DOCKER_DB_POSTGRES_VOLUMES}
 
   app:
     build:
@@ -21,17 +21,9 @@ services:
       - db
     ports:
       - ${DOCKER_APP_PORT}
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - DOCKER_APP_PORT=${DOCKER_APP_PORT}
-      - DOCKER_DB_POSTGRES_PORT=${DOCKER_DB_POSTGRES_PORT}
-      - DOCKER_DB_POSTGRES_DBNAME=${DOCKER_DB_POSTGRES_DBNAME}
-      - DOCKER_DB_IMAGE_NAME=${DOCKER_DB_IMAGE_NAME}
-      - DOCKER_DB_CONTAINER_NAME=${DOCKER_DB_CONTAINER_NAME}
-      - DOCKER_DB_POSTGRES_VOLUMES=${DOCKER_DB_POSTGRES_VOLUMES}
-      - DOCKER_APP_CONTAINER_NAME=${DOCKER_APP_CONTAINER_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
+
+    env_file:
+      - .env
 
 volumes:
   pgdata:

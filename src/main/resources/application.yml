@@ -6,7 +6,7 @@ spring:
   application:
     name: see-write-say
 
-
+  datasource:
     driverClassName: ${DATASOURCE_DRIVER_CLASSNAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}

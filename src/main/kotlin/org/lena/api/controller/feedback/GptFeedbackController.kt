@@ -33,7 +33,7 @@ class GptFeedbackController(
     ): ResponseEntity<ApiResponse<GptFeedbackResponseDto>> {
         logger.debug { "GPT 피드백 생성 요청 - userId=${user.id}, imageId=${request.imageId}" }
 
-        val result = gptFeedbackService.generateFeedback(user, request.sentence, request.imageId)
+        val result = gptFeedbackService.generateFeedback(request.sentence, request.imageId)
 
         return ResponseEntity.ok(ApiResponse.success(result, "GPT 피드백 생성 완료"))
     }

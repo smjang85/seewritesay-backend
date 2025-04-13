@@ -28,8 +28,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/history/writing")
 class HistoryWritingController(
-    private val userService: UserService,
-    private val imageService: ImageService,
     private val writingHistoryService: HistoryWritingService
 ) {
     companion object : KLogging()
@@ -43,41 +41,9 @@ class HistoryWritingController(
         requireNotNull(user) { "사용자 정보가 없습니다." }
         logger.debug { "GET /history/writing | userId=${user.id}, imageId=$imageId" }
 
-        val foundUser = userService.findById(user.id)
-        val response = writingHistoryService.getHistory(foundUser, imageId)
+        val response = writingHistoryService.getHistory(user.id, imageId)
 
         return ResponseEntity.ok(ApiResponse.Companion.success(response, "작문 히스토리 조회 성공"))
-    }
-
-    @Operation(summary = "작문 히스토리 저장", description = "사용자가 입력한 문장을 특정 이미지에 연결하여 작문 히스토리를 저장합니다.")
-    @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun saveHistory(
-        @RequestBody @Valid request: HistoryWritingRequestDto,
-        @CurrentUser user: CustomUserPrincipal?
-    ){
-        requireNotNull(user) { "사용자 정보가 없습니다." }
-        logger.debug { "POST /history/writing | userId=${user.id}, imageId=${request.imageId}" }
-
-        val foundUser = userService.findById(user.id)
-        val image = imageService.findById(request.imageId)
-        val response = writingHistoryService.saveHistory(foundUser, image, request)
-
-        logger.debug { "POST /history/writing | response : ${response}" }
-    }
-
-    @Operation(summary = "카테고리별 히스토리 조회", description = "사용자의 작문 히스토리를 카테고리 기준으로 그룹화하여 조회합니다.")
-    @GetMapping("/with-category")
-    fun getUserHistoryWithCategory(
-        @CurrentUser user: CustomUserPrincipal?
-    ): ResponseEntity<ApiResponse<List<HistoryWritingResponseDto>>> {
-        requireNotNull(user) { "사용자 정보가 없습니다." }
-        logger.debug { "GET /history/writing/with-category | userId=${user.id}" }
-
-        val foundUser = userService.findById(user.id)
-        val response = writingHistoryService.getUserHistoryWithCategory(foundUser)
-
-        return ResponseEntity.ok(ApiResponse.Companion.success(response, "카테고리별 작문 히스토리 조회 성공"))
     }
 
     @Operation(summary = "작문 히스토리 삭제", description = "작문 히스토리 항목을 삭제합니다.")
@@ -90,7 +56,35 @@ class HistoryWritingController(
         requireNotNull(user) { "사용자 정보가 없습니다." }
         logger.debug { "DELETE /history/writing | userId=${user.id}, historyId=$id" }
 
-        val foundUser = userService.findById(user.id)
-        writingHistoryService.deleteHistoryById(foundUser, id)
+        writingHistoryService.deleteHistoryById(user.id, id)
+    }
+
+    @Operation(summary = "카테고리별 히스토리 조회", description = "사용자의 작문 히스토리를 카테고리 기준으로 그룹화하여 조회합니다.")
+    @GetMapping("/with-category")
+    fun getUserHistoryWithCategory(
+        @CurrentUser user: CustomUserPrincipal?
+    ): ResponseEntity<ApiResponse<List<HistoryWritingResponseDto>>> {
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "GET /history/writing/with-category | userId=${user.id}" }
+
+
+        val response = writingHistoryService.getUserHistoryWithCategory(user.id)
+
+        return ResponseEntity.ok(ApiResponse.Companion.success(response, "카테고리별 작문 히스토리 조회 성공"))
+    }
+
+    @Operation(summary = "작문 히스토리 저장", description = "사용자가 입력한 문장을 특정 이미지에 연결하여 작문 히스토리를 저장합니다.")
+    @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun saveHistory(
+        @RequestBody @Valid request: HistoryWritingRequestDto,
+        @CurrentUser user: CustomUserPrincipal?
+    ){
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "POST /history/writing | userId=${user.id}, imageId=${request.imageId} , grade = ${request.grade}" }
+
+        val response = writingHistoryService.saveHistory(user.id, request.imageId, request.sentence, request.grade)
+
+        logger.debug { "POST /history/writing | response : ${response}" }
     }
 }

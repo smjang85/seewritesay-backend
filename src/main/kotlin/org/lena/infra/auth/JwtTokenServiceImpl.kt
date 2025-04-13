@@ -27,20 +27,22 @@ class JwtTokenServiceImpl : JwtTokenService {
         require(!user.email.isNullOrBlank()) { "이메일은 비어 있을 수 없습니다." }
 
         val now = Date()
-        val validity = Date(now.time + validityInMilliseconds)
+        val expiration = Date(now.time + validityInMilliseconds) // 유효 기간 설정
 
         val secretKey: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyString))
-        logger.debug("createToken user.id $user.id" )
+        logger.debug("createToken user.id ${user.id}")
+
         return Jwts.builder()
             .setSubject(user.email) // 기본 subject는 email
             .setIssuedAt(now)
-            .setExpiration(validity)
+            .setExpiration(expiration)
             .claim("id", user.id)
-            .claim("name", user.name ?: "") // 선택적으로 name도 같이 추가 가능
+            .claim("name", user.name ?: "") // 선택적으로 name도 추가 가능
             .signWith(secretKey, SignatureAlgorithm.HS256)
             .compact()
     }
 
+    // 토큰에서 ID 추출
     override fun extractId(token: String): Long? {
         val secretKey: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyString))
 
@@ -50,10 +52,11 @@ class JwtTokenServiceImpl : JwtTokenService {
             .parseClaimsJws(token)
             .body
 
-        // ⭐ Number로 안전하게 가져와서 Long으로 변환
+        // Number 타입으로 안전하게 가져와 Long으로 변환
         return (claims["id"] as? Number)?.toLong()
     }
 
+    // 토큰에서 이메일 추출
     override fun extractEmail(token: String): String {
         val secretKey: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyString))
 
@@ -65,6 +68,7 @@ class JwtTokenServiceImpl : JwtTokenService {
             .subject
     }
 
+    // 토큰에서 이름 추출
     override fun extractName(token: String): String? {
         val secretKey: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyString))
 
@@ -73,5 +77,23 @@ class JwtTokenServiceImpl : JwtTokenService {
             .build()
             .parseClaimsJws(token)
             .body["name"] as? String
+    }
+
+    // 토큰 만료 여부 확인
+    override fun isTokenExpired(token: String): Boolean {
+        val secretKey: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyString))
+
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(secretKey)
+            .build()
+            .parseClaimsJws(token)
+            .body
+
+        val expirationDate = claims.expiration
+        return expirationDate.before(Date()) // 만료된 경우 true 반환
+    }
+
+    override fun refreshToken(user: User): String {
+        return createToken(user) // 기존의 토큰 생성 로직을 재사용
     }
 }

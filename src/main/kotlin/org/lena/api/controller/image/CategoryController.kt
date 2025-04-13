@@ -68,7 +68,7 @@ class CategoryController(
     ): ResponseEntity<ApiResponse<CategoryResponseDto>> {
         logger.debug { "POST /images/categories - 카테고리 생성 요청: ${request.name}" }
 
-        val saved = categoryService.save(Category.of(name = request.name))
+        val saved = categoryService.save(request.name)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)

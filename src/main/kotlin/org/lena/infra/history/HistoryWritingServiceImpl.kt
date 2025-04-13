@@ -1,116 +1,82 @@
 package org.lena.infra.history
 
-import mu.KLogging
-import mu.KotlinLogging
-import org.lena.api.dto.history.HistoryWritingRequestDto
 import org.lena.api.dto.history.HistoryWritingResponseDto
-import org.lena.domain.image.entity.Image
-import org.lena.domain.user.entity.User
 import org.lena.domain.history.entity.HistoryWriting
 import org.lena.domain.history.repository.HistoryWritingRepository
 import org.lena.domain.history.service.HistoryWritingService
 import org.lena.domain.image.service.CategoryService
+import org.lena.domain.image.service.ImageService
+import org.lena.domain.user.service.UserService
 import org.springframework.stereotype.Service
-
 
 @Service
 class HistoryWritingServiceImpl(
     private val historyWritingRepository: HistoryWritingRepository,
-    private val categoryService: CategoryService,
+    private val userService: UserService,
+    private val imageService: ImageService,
+    private val categoryService: CategoryService
 ) : HistoryWritingService {
 
-
-    companion object : KLogging()
-
-    override fun getHistory(user: User, imageId: Long?): List<HistoryWritingResponseDto> {
-        val histories = if (imageId != null) {
-            historyWritingRepository.findAllByUserIdAndImageId(user.id, imageId)
+    override fun getHistory(userId: Long, imageId: Long?): List<HistoryWritingResponseDto> {
+        val historyList = if (imageId != null) {
+            historyWritingRepository.findAllByUserIdAndImageId(userId, imageId)
         } else {
-            historyWritingRepository.findAllByUserId(user.id)
+            historyWritingRepository.findAllByUserId(userId)
         }
 
-        return histories.map {
-            val image = it.image
-            HistoryWritingResponseDto(
-                id = it.id!!,
-                imageId = image.id,
-                imagePath = image.path,
-                imageName = image.name,
-                imageDescription = image.description,
-                sentence = it.sentence,
-                categoryId = image.categoryId,
-                categoryName = it.category ?: "Unknown Category",
-                createdAt = it.createdAt
-            )
+        return historyList.map { history ->
+            val categoryName = resolveCategoryName(history.image.categoryId, history.category)
+            history.toDto(categoryName)
         }
     }
 
-    override fun saveHistory(user: User, image: Image, historyWritingRequestDto: HistoryWritingRequestDto): HistoryWritingResponseDto {
+    override fun getUserHistoryWithCategory(userId: Long): List<HistoryWritingResponseDto> {
+        val historyList = historyWritingRepository.findAllByUserId(userId)
+
+        return historyList.map { history ->
+            val categoryName = resolveCategoryName(history.image.categoryId, history.category)
+            history.toDto(categoryName)
+        }
+    }
+
+    override fun saveHistory(
+        userId: Long,
+        imageId: Long,
+        sentence: String,
+        grade: String
+    ): HistoryWritingResponseDto {
+        val user = userService.findById(userId)
+        val image = imageService.findById(imageId)
         val category = categoryService.findById(image.categoryId)
 
-        // 기존 히스토리 존재 여부 확인
-        val existing = historyWritingRepository.findByUserIdAndImageId(user.id, image.id)
+        val existing = historyWritingRepository.findByUserIdAndImageId(userId, imageId)
 
-        logger.debug{"existing : $existing"}
         val saved = if (existing != null) {
-            existing.updateSentence(historyWritingRequestDto.sentence, historyWritingRequestDto.grade, user.id.toString())
-
-            logger.debug{"updateSentence : $existing"}
-
+            existing.updateSentence(sentence, grade, userId.toString())
             historyWritingRepository.save(existing)
         } else {
             val entity = HistoryWriting.of(
                 user = user,
                 image = image,
-                sentence = historyWritingRequestDto.sentence,
-                grade = historyWritingRequestDto.grade,
+                sentence = sentence,
+                grade = grade,
                 category = category?.name,
-                createdBy = user.id.toString()
+                createdBy = userId.toString()
             )
-
-            logger.debug{"insert existing : $existing"}
             historyWritingRepository.save(entity)
         }
 
-        return HistoryWritingResponseDto(
-            id = saved.id!!,
-            imageId = image.id,
-            imagePath = image.path,
-            imageName = image.name,
-            imageDescription = image.description,
-            sentence = saved.sentence,
-            categoryId = image.categoryId,
-            categoryName = category!!.name,
-            createdAt = saved.createdAt
-        )
+        return saved.toDto(category?.name ?: "Unknown Category")
     }
 
-
-
-    override fun getUserHistoryWithCategory(user: User): List<HistoryWritingResponseDto> {
-        val historyList = historyWritingRepository.findAllByUserId(user.id)
-        return historyList.map { history ->
-            val image = history.image
-            val categoryName = categoryService.findNameById(image.categoryId) ?: "Unknown Category"
-
-            HistoryWritingResponseDto(
-                id = history.id!!,
-                imageId = image.id,
-                imagePath = image.path,
-                imageName = image.name,
-                imageDescription = image.description,
-                sentence = history.sentence,
-                categoryId = image.categoryId,
-                categoryName = categoryName,
-                createdAt = history.createdAt
-            )
-        }
-    }
-
-
-    override fun deleteHistoryById(user: User, historyId: Long) {
-        val historyWriting: HistoryWriting = historyWritingRepository.findByIdAndUser(historyId, user)
+    override fun deleteHistoryById(userId: Long, historyId: Long) {
+        val user = userService.findById(userId)
+        val history = historyWritingRepository.findByIdAndUser(historyId, user)
             ?: throw IllegalArgumentException("해당 히스토리를 찾을 수 없습니다.")
-        historyWritingRepository.delete(historyWriting)
+        historyWritingRepository.delete(history)
+    }
+
+    private fun resolveCategoryName(categoryId: Long, fallback: String?): String {
+        return categoryService.findNameById(categoryId) ?: fallback ?: "Unknown Category"
     }
 }

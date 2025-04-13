@@ -4,39 +4,52 @@ import org.lena.api.dto.feedback.UserFeedbackResponseDto
 import org.lena.domain.feedback.entity.UserFeedback
 import org.lena.domain.feedback.repository.UserFeedbackRepository
 import org.lena.domain.feedback.service.UserFeedbackService
-import org.lena.domain.user.entity.User
-import org.lena.domain.image.entity.Image
+import org.lena.domain.image.service.ImageService
+import org.lena.domain.user.service.UserService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserFeedbackServiceImpl(
-    private val userFeedbackRepository: UserFeedbackRepository
+    private val userFeedbackRepository: UserFeedbackRepository,
+    private val userService: UserService,
+    private val imageService: ImageService,
 ) : UserFeedbackService {
 
-    override fun getRemainingCount(user: User, image: Image): UserFeedbackResponseDto {
-        val remainingCount = userFeedbackRepository.findByUserAndImage(user, image)?.remainingCount ?: 30
-        return UserFeedbackResponseDto(remainingCount = remainingCount)
+    override fun getRemainingCount(userId: Long, imageId: Long): UserFeedbackResponseDto {
+        val user = userService.findById(userId)
+        val image = imageService.findById(imageId)
+
+        val userFeedback = userFeedbackRepository.findByUserAndImage(user, image)
+            ?: UserFeedback.of(
+                user = user,
+                image = image,
+                writing_remaining_count = 30,
+                reading_remaining_count = 2
+            )
+
+        return UserFeedbackResponseDto(
+            writingRemainingCount = userFeedback.writing_remaining_count,
+            readingRemainingCount = userFeedback.reading_remaining_count
+        )
     }
 
     @Transactional
-    override fun decrementFeedbackCount(user: User, image: Image) {
-        val feedback = userFeedbackRepository.findByUserAndImage(user, image)
-            ?: UserFeedback.of(user = user, image = image, remainingCount = 5)
+    override fun decrementWritingFeedbackCount(userId: Long, imageId: Long) {
+        val user = userService.findById(userId)
+        val image = imageService.findById(imageId)
 
-        val current = feedback.remainingCount
-        if (current > 0) {
-            feedback.remainingCount = current - 1
-            userFeedbackRepository.save(feedback)
+        val userFeedback = userFeedbackRepository.findByUserAndImage(user, image)
+            ?: UserFeedback.of(
+                user = user,
+                image = image,
+                writing_remaining_count = 30,
+                reading_remaining_count = 2
+            )
+
+        if (userFeedback.writing_remaining_count > 0) {
+            userFeedback.writing_remaining_count -= 1
+            userFeedbackRepository.save(userFeedback)
         }
-    }
-
-    @Transactional
-    override fun resetFeedbackCount(user: User, image: Image, count: Int) {
-        val feedback = userFeedbackRepository.findByUserAndImage(user, image)
-            ?: UserFeedback.of(user = user, image = image, remainingCount = count)
-
-        feedback.remainingCount = count
-        userFeedbackRepository.save(feedback)
     }
 }

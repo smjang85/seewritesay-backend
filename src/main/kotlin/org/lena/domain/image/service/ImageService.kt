@@ -6,5 +6,5 @@ import org.lena.domain.image.entity.Image
 interface ImageService {
     fun getDescriptionByImageId(imageId: Long): String
     fun findAll(): List<ImageResponseDto>
-    fun findById(id: Long): Image
+    fun findById(imageId: Long): Image
 }

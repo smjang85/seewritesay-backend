@@ -1,6 +1,7 @@
 package org.lena.domain.history.entity
 
 import jakarta.persistence.*
+import org.lena.api.dto.history.HistoryWritingResponseDto
 import org.lena.domain.image.entity.Image
 import org.lena.domain.user.entity.User
 import java.time.LocalDateTime
@@ -76,6 +77,21 @@ class HistoryWriting private constructor(
         updatedAt = null,
         updatedBy = null
     )
+
+    // 클래스 내부에 추가
+    fun toDto(categoryName: String): HistoryWritingResponseDto {
+        return HistoryWritingResponseDto(
+            id = this.id!!,
+            imageId = image.id,
+            imagePath = image.path,
+            imageName = image.name,
+            imageDescription = image.description,
+            categoryId = image.categoryId,
+            categoryName = categoryName,
+            sentence = this.sentence,
+            grade = this.grade
+        )
+    }
 
     fun updateSentence(newSentence: String, newGrade: String, updatedBy: String) {
         if (this.sentence == newSentence) return

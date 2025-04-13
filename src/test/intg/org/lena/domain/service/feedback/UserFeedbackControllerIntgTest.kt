@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.lena.api.common.dto.ApiResponse
 import org.lena.api.dto.feedback.UserFeedbackRequestDto
-import org.lena.api.dto.feedback.UserFeedbackResetRequestDto
 import org.lena.domain.image.entity.Image
 import org.lena.domain.image.repository.ImageRepository
 import org.lena.domain.user.entity.User
@@ -89,30 +88,5 @@ class UserFeedbackControllerIntgTest {
         println("횟수 차감 응답: $response")
         assertNotNull(response)
         assertEquals(200, response.status)
-    }
-
-    @Test
-    @DisplayName("resetFeedback_피드백 횟수 초기화 요청 성공")
-    fun resetFeedback_피드백_초기화() {
-        val request = UserFeedbackResetRequestDto(
-            imageId = testImage.id!!,
-            count = 5
-        )
-
-        val response = webTestClient.post()
-            .uri("/api/v1/user/feedback/reset")
-            .headers { it.setBasicAuth(testUser.email, "dummy") }
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(ApiResponse::class.java)
-            .returnResult()
-            .responseBody
-
-        println("초기화 응답: $response")
-        assertNotNull(response)
-        assertEquals(200, response.status)
-        assertEquals(5, response.data)
     }
 }

@@ -12,6 +12,6 @@ data class HistoryWritingRequestDto(
     val sentence: String,
 
     @field:NotBlank(message = "등급은 비어 있을 수 없습니다.")
-    val grade: String,
+    val grade: String
 
 )

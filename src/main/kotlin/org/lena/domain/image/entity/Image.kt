@@ -1,6 +1,7 @@
 package org.lena.domain.image.entity
 
 import jakarta.persistence.*
+import org.lena.api.dto.image.ImageResponseDto
 import java.time.LocalDateTime
 
 @Entity
@@ -37,6 +38,16 @@ data class Image(
 ) {
     // JPA 기본 생성자
     constructor() : this(0, "", "", 0)
+
+    fun toDto(categoryName: String?): ImageResponseDto {
+        return ImageResponseDto(
+            id = this.id,
+            name = this.name,
+            path = this.path,
+            description = this.description,
+            categoryName = categoryName
+        )
+    }
 
     companion object {
         fun of(

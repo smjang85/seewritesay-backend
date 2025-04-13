@@ -1,39 +1,37 @@
 services:
   db:
-    image: postgres:15
-    container_name: postgres
+    image: ${DOCKER_DB_IMAGE_NAME}
+    container_name: ${DOCKER_DB_CONTAINER_NAME}
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}  # 로컬 환경변수 사용
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - ${DOCKER_DB_POSTGRES_PORT}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ${POSTGRES_VOLUMES}
 
   app:
     build:
       context: .
-    container_name: seewritesay-app
+    container_name: ${DOCKER_APP_CONTAINER_NAME}
     restart: always
     depends_on:
       - db
     ports:
-      - "8080:8080"
+      - ${DOCKER_APP_PORT}
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - DOCKER_APP_PORT=${DOCKER_APP_PORT}
+      - DOCKER_DB_POSTGRES_PORT=${DOCKER_DB_POSTGRES_PORT}
+      - DOCKER_DB_POSTGRES_DBNAME=${DOCKER_DB_POSTGRES_DBNAME}
+      - DOCKER_DB_IMAGE_NAME=${DOCKER_DB_IMAGE_NAME}
+      - DOCKER_DB_CONTAINER_NAME=${DOCKER_DB_CONTAINER_NAME}
+      - DOCKER_DB_POSTGRES_VOLUMES=${DOCKER_DB_POSTGRES_VOLUMES}
+      - DOCKER_APP_CONTAINER_NAME=${DOCKER_APP_CONTAINER_NAME}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DATASOURCE_URL=${DATASOURCE_URL}
-      - DATASOURCE_DRIVER_CLASSNAME=${DATASOURCE_DRIVER_CLASSNAME}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - DATABASE-PLATFORM=${DATABASE-PLATFORM}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
-      - JWT_SECRET=${JWT_SECRET}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
 
 volumes:
   pgdata:

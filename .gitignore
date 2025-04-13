@@ -93,3 +93,8 @@ Icon?
 .env.*
 
 application-test.yml
+
+/build/
+/out/
+/.idea/
+/*.iml

@@ -24,8 +24,11 @@ class UserFeedback private constructor(
     @JoinColumn(name = "image_id", nullable = false)
     var image: Image,
 
-    @Column(name = "remaining_count", nullable = false)
-    var remainingCount: Int,
+    @Column(name = "writing_remaining_count", nullable = false)
+    var writing_remaining_count: Int,
+
+    @Column(name = "reading_remaining_count", nullable = false)
+    var reading_remaining_count: Int,
 
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -45,13 +48,15 @@ class UserFeedback private constructor(
         fun of(
             user: User,
             image: Image,
-            remainingCount: Int,
+            writing_remaining_count: Int,
+            reading_remaining_count: Int,
             createdBy: String? = null
         ): UserFeedback {
             return UserFeedback(
                 user = user,
                 image = image,
-                remainingCount = remainingCount,
+                writing_remaining_count = writing_remaining_count,
+                reading_remaining_count = reading_remaining_count,
                 createdBy = createdBy
             )
         }
@@ -62,6 +67,7 @@ class UserFeedback private constructor(
         0,
         User(),
         Image(),
+        0,
         0,
         LocalDateTime.now(),
         null,

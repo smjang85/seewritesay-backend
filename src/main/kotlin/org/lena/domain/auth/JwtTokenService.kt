@@ -7,4 +7,6 @@ interface JwtTokenService {
     fun extractId(token: String): Long?
     fun extractEmail(token: String): String
     fun extractName(token: String): String?
+    fun isTokenExpired(token: String): Boolean
+    fun refreshToken(user: User): String
 }

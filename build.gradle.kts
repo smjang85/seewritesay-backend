@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.spring") version "2.1.20"
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -16,8 +16,6 @@ java {
 
 tasks.test {
     useJUnitPlatform()
-
-    // 🔽 이 줄 추가
     include("**/*Test.class")
 }
 
@@ -26,41 +24,44 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation") // ✨ Request DTO 유효성 검증
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client") // ✨ 구글 로그인 연동
-    implementation("com.auth0:java-jwt:4.4.0") // JWT 발급용
+    implementation("org.springframework.boot:spring-boot-starter-security:3.4.4")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.4.4")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.4")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.4.4")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.4.4") // Request DTO 유효성 검증
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.4") // 구글 로그인 연동
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
-
-    // 🔐 JWT 라이브러리 추가
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // JSON 처리용 Jackson 바인딩
-    runtimeOnly("org.postgresql:postgresql")
-
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
-    testImplementation("net.java.dev.jna:jna:5.13.0")
-    testImplementation("net.java.dev.jna:jna-platform:5.13.0")
+    // JWT 라이브러리 추가
+    implementation("com.auth0:java-jwt:4.5.0")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    runtimeOnly("org.postgresql:postgresql:42.7.5")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.springframework.security:spring-security-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation("org.springframework.security:spring-security-test:6.4.4")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.4.4") {
+        exclude(group = "org.mockito")
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine") // vintage 엔진 제거
+    }
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.20")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.12.2") // JUnit5
     testImplementation("org.testcontainers:postgresql")
 
-    testImplementation("io.mockk:mockk:1.13.10") // 최신 버전 기준 (2025년 4월 기준 안정 버전)
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1") // JUnit5
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.mockito")
-        exclude(group = "org.junit.vintage", module = "junit-vintage-engine") // ✅ vintage 엔진 제거
-    }
+    testImplementation("net.java.dev.jna:jna:5.17.0")
+    testImplementation("net.java.dev.jna:jna-platform:5.17.0")
+
+    testImplementation("io.mockk:mockk:1.14.0")
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
 }
+
 
 kotlin {
     compilerOptions {
@@ -73,15 +74,10 @@ tasks.withType<Test> {
 }
 
 
-
 sourceSets {
     test {
-        // after 7.1
-
         java {
             setSrcDirs(listOf("src/test/intg", "src/test//unit"))
         }
-
-
     }
 }

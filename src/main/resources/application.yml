@@ -1,12 +1,12 @@
 server:
-  address: 0.0.0.0
-  port: 8080
+  address: ${APP_ADDRESS}
+  port: ${APP_PORT}
 
 spring:
   application:
     name: see-write-say
 
-  datasource:
+
     driverClassName: ${DATASOURCE_DRIVER_CLASSNAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -43,7 +43,7 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
-  validity-ms: 3600000
+  validity-ms: ${JWT_VALIDITY_MS}
 
 openai:
   api:
@@ -62,12 +62,15 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+cors:
+  allowed-origins:
+    - ${CORS_ALLOWED_ORIGINS_PROD}
+    - ${CORS_ALLOWED_ORIGINS_LOCAL}
 ---
 spring:
   config:
     activate:
       on-profile: prod
-
   datasource:
     url: ${DATASOURCE_URL}
 
@@ -76,6 +79,5 @@ spring:
   config:
     activate:
       on-profile: local
-
   datasource:
     url: ${DATASOURCE_URL}

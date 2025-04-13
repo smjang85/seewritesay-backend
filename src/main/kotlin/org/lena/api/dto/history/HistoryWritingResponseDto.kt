@@ -8,7 +8,7 @@ data class HistoryWritingResponseDto(
     val imageName: String,
     val imageDescription: String? = null,
     val sentence: String,
+    val grade: String,
     val categoryId: Long,
     val categoryName: String,
-    val createdAt: LocalDateTime?
 )

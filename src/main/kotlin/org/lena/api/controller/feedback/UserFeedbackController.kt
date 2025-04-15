@@ -52,4 +52,17 @@ class UserFeedbackController(
         userFeedbackService.decrementWritingFeedbackCount(user.id, request.imageId)
     }
 
+    @PostMapping("/reading/decrement")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "피드백 횟수 차감", description = "해당 이미지에 대한 사용자의 작문 피드백 횟수를 1 감소시킵니다.")
+    fun decrementReadingFeedbackCount(
+        @RequestBody @Valid request: UserFeedbackRequestDto,
+        @CurrentUser user: CustomUserPrincipal?
+    ) {
+        requireNotNull(user) { "사용자 정보가 없습니다." }
+        logger.debug { "↘️ [POST] Decrement Feedback | userId=${user.id}, imageId=${request.imageId}" }
+
+        userFeedbackService.decrementReadingFeedbackCount(user.id, request.imageId)
+    }
+
 }

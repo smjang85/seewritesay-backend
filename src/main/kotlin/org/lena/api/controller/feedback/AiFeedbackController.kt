@@ -58,23 +58,4 @@ class AiFeedbackController(
 
         return ResponseEntity.ok(ApiResponse.success(result, "발음 피드백 생성 완료"))
     }
-
-    @PostMapping("/test")
-    fun test(
-        @RequestPart file: MultipartFile,
-        @RequestParam(required = false) sentence: String?
-    ): ResponseEntity<ApiResponse<AiReadingFeedbackResponseDto>> {
-        val result = AiReadingFeedbackResponseDto(
-            accuracyScore = 86.0,
-            fluencyScore = 98.0,
-            completenessScore = 100.0,
-            pronScore = 91.2,
-            confidence = 0.97,
-            sentenceFromFile = "She is walking on the road.",
-            sentence = null
-        )
-
-        return ResponseEntity.ok(ApiResponse.success(result, "발음 피드백 생성 완료"))
-    }
-
 }

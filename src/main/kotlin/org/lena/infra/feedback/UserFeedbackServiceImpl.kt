@@ -57,4 +57,22 @@ class UserFeedbackServiceImpl(
             userFeedbackRepository.save(userFeedback)
         }
     }
+
+    override fun decrementReadingFeedbackCount(userId: Long, imageId: Long) {
+        val user = userService.findById(userId)
+        val image = imageService.findById(imageId)
+
+        val userFeedback = userFeedbackRepository.findByUserAndImage(user, image)
+            ?: UserFeedback.of(
+                user = user,
+                image = image,
+                writing_remaining_count = 30,
+                reading_remaining_count = 2
+            )
+
+        if (userFeedback.reading_remaining_count > 0) {
+            userFeedback.reading_remaining_count -= 1
+            userFeedbackRepository.save(userFeedback)
+        }
+    }
 }

@@ -11,10 +11,20 @@ class User private constructor(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     val email: String,
 
+    @Column(length = 100)
     val name: String? = null,
+
+    @Column(length = 255, unique = true)
+    var nickname: String? = null,
+
+    @Column(length = 25)
+    var avatar: String? = null,
+
+    @Column(name = "age_group", length = 1)
+    var ageGroup: String? = null,
 
     @Column(name = "last_login_at")
     var lastLoginAt: LocalDateTime? = null,
@@ -26,10 +36,10 @@ class User private constructor(
     val createdBy: String? = null,
 
     @Column(name = "updated_at")
-    val updatedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
 
     @Column(name = "updated_by")
-    val updatedBy: String? = null
+    var updatedBy: String? = null
 
 ) {
     companion object {
@@ -43,6 +53,7 @@ class User private constructor(
                 email = email,
                 name = name,
                 lastLoginAt = lastLoginAt,
+                createdAt = LocalDateTime.now(),
                 createdBy = createdBy
             )
         }
@@ -53,6 +64,9 @@ class User private constructor(
         id = 0,
         email = "",
         name = null,
+        nickname = null,
+        avatar = null,
+        ageGroup = null,
         lastLoginAt = null,
         createdAt = LocalDateTime.now(),
         createdBy = null,

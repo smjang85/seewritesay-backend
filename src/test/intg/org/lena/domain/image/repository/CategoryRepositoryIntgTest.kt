@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -24,35 +23,36 @@ class CategoryRepositoryIntgTest {
     @BeforeEach
     fun setup() {
         categoryRepository.deleteAll()
-        savedCategory = categoryRepository.save(Category.of(name = "TestCategory"))
+        savedCategory = categoryRepository.save(Category.of(name = "테스트카테고리", createdBy = "test"))
     }
 
     @Test
-    @DisplayName("findByName_카테고리_이름으로_조회")
-    fun findByName_카테고리_이름으로_조회() {
-        val found = categoryRepository.findByName("TestCategory")
-        assertEquals(savedCategory.id, found?.id)
-        assertEquals("TestCategory", found?.name)
+    @DisplayName("findByName_카테고리이름으로조회_성공")
+    fun findByName_카테고리이름으로조회_성공() {
+        val found = categoryRepository.findByName("테스트카테고리")
+        assertNotNull(found)
+        assertEquals(savedCategory.id, found.id)
+        assertEquals("테스트카테고리", found.name)
     }
 
     @Test
-    @DisplayName("findByName_존재하지_않는_이름")
-    fun findByName_존재하지_않는_이름() {
-        val result = categoryRepository.findByName("NonExistent")
+    @DisplayName("findByName_존재하지않는이름_조회결과_null")
+    fun findByName_존재하지않는이름_조회결과_null() {
+        val result = categoryRepository.findByName("없는카테고리")
         assertNull(result)
     }
 
     @Test
-    @DisplayName("findNameById_ID로_이름_조회")
-    fun findNameById_ID로_이름_조회() {
-        val result = categoryRepository.findNameById(savedCategory.id!!)
-        assertEquals("TestCategory", result)
+    @DisplayName("findNameById_ID로카테고리이름조회_성공")
+    fun findNameById_ID로카테고리이름조회_성공() {
+        val name = categoryRepository.findNameById(savedCategory.id!!)
+        assertEquals("테스트카테고리", name)
     }
 
     @Test
-    @DisplayName("findNameById_존재하지_않는_ID")
-    fun findNameById_존재하지_않는_ID() {
-        val result = categoryRepository.findNameById(999L)
+    @DisplayName("findNameById_존재하지않는ID_null반환")
+    fun findNameById_존재하지않는ID_null반환() {
+        val result = categoryRepository.findNameById(99999L)
         assertNull(result)
     }
 }

@@ -11,8 +11,6 @@ import org.lena.api.dto.history.HistoryWritingRequestDto
 import org.lena.api.dto.history.HistoryWritingResponseDto
 import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.history.service.HistoryWritingService
-import org.lena.domain.image.service.ImageService
-import org.lena.domain.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -81,10 +79,10 @@ class HistoryWritingController(
         @CurrentUser user: CustomUserPrincipal?
     ){
         requireNotNull(user) { "사용자 정보가 없습니다." }
-        logger.debug { "POST /history/writing | userId=${user.id}, imageId=${request.imageId} , grade = ${request.grade}" }
+        logger.debug { "POST /history/writing save| userId=${user.id}, imageId=${request.imageId} , grade = ${request.grade}" }
 
         val response = writingHistoryService.saveHistory(user.id, request.imageId, request.sentence, request.grade)
 
-        logger.debug { "POST /history/writing | response : ${response}" }
+        logger.debug { "POST /history/writing save| response : ${response}" }
     }
 }

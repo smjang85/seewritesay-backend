@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -45,30 +44,47 @@ class HistoryWritingRepositoryIntgTest {
 
         historyWritingRepository.saveAll(
             listOf(
-                HistoryWriting.of(user = user, image = image1, sentence = "First", createdBy = user.id.toString()),
-                HistoryWriting.of(user = user, image = image2, sentence = "Second", createdBy = user.id.toString())
+                HistoryWriting.of(user, image1, sentence = "First sentence", grade = "A", createdBy = user.id.toString()),
+                HistoryWriting.of(user, image2, sentence = "Second sentence", grade = "B", createdBy = user.id.toString())
             )
         )
     }
 
     @Test
-    @DisplayName("findAllByUserId_유저의_전체_히스토리_조회")
-    fun findAllByUserId_유저의_전체_히스토리_조회() {
-        val result = historyWritingRepository.findAllByUserId(user.id!!)
-        assertEquals(2, result.size)
+    @DisplayName("findAllByUserId_사용자전체히스토리_조회")
+    fun findAllByUserId_사용자전체히스토리_조회() {
+        val results = historyWritingRepository.findAllByUserId(user.id!!)
+        assertEquals(2, results.size)
     }
 
     @Test
-    @DisplayName("findAllByUserIdAndImageId_유저와_이미지로_필터링")
-    fun findAllByUserIdAndImageId_유저와_이미지로_필터링() {
-        val result = historyWritingRepository.findAllByUserIdAndImageId(user.id!!, image1.id!!)
-        assertEquals(1, result.size)
-        assertEquals("First", result[0].sentence)
+    @DisplayName("findAllByUserIdAndImageId_사용자_이미지별_히스토리_조회")
+    fun findAllByUserIdAndImageId_사용자_이미지별_히스토리_조회() {
+        val results = historyWritingRepository.findAllByUserIdAndImageId(user.id!!, image1.id!!)
+        assertEquals(1, results.size)
+        assertEquals("First sentence", results.first().sentence)
     }
 
     @Test
-    @DisplayName("조건에_맞는_히스토리가_없을_경우_빈_리스트_반환")
-    fun 조건에_맞는_히스토리가_없을_경우_빈_리스트_반환() {
+    @DisplayName("findByUserIdAndImageId_단건_조회_성공")
+    fun findByUserIdAndImageId_단건_조회_성공() {
+        val result = historyWritingRepository.findByUserIdAndImageId(user.id!!, image2.id!!)
+        assertNotNull(result)
+        assertEquals("Second sentence", result.sentence)
+    }
+
+    @Test
+    @DisplayName("findByIdAndUser_아이디와사용자로_단건_조회")
+    fun findByIdAndUser_아이디와사용자로_단건_조회() {
+        val saved = historyWritingRepository.findAllByUserId(user.id!!).first()
+        val result = historyWritingRepository.findByIdAndUser(saved.id!!, user)
+        assertNotNull(result)
+        assertEquals(saved.id, result.id)
+    }
+
+    @Test
+    @DisplayName("findAllByUserId_다른사용자_히스토리없음")
+    fun findAllByUserId_다른사용자_히스토리없음() {
         val otherUser = userRepository.save(User.of(email = "other@lena.org", name = "OtherUser"))
         val result = historyWritingRepository.findAllByUserId(otherUser.id!!)
         assertTrue(result.isEmpty())

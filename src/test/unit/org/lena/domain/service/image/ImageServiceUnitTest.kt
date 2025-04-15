@@ -10,7 +10,7 @@ import org.lena.domain.image.entity.Category
 import org.lena.domain.image.entity.Image
 import org.lena.domain.image.repository.CategoryRepository
 import org.lena.domain.image.repository.ImageRepository
-import org.lena.infra.image.ImageServiceImpl
+import org.lena.domain.image.service.ImageServiceImpl
 import java.util.*
 import kotlin.test.*
 
@@ -20,23 +20,31 @@ class ImageServiceUnitTest {
     private val imageRepository: ImageRepository = mockk()
     private val categoryRepository: CategoryRepository = mockk()
 
-    private val image = Image.of(
-        name = "Sample",
-        path = "/sample.jpg",
-        categoryId = 1L,
-        description = "설명"
-    )
-
-    private val category = Category.of(name = "여행")
+    private lateinit var image: Image
+    private lateinit var category: Category
 
     @BeforeEach
     fun setUp() {
         imageService = ImageServiceImpl(imageRepository, categoryRepository)
+
+        category = Category.of(name = "여행").apply {
+            // ID 설정을 위한 리플렉션 또는 JPA 저장 가정
+            val field = this::class.java.getDeclaredField("id")
+            field.isAccessible = true
+            field.set(this, 1L)
+        }
+
+        image = Image.of(
+            name = "Sample",
+            path = "/sample.jpg",
+            categoryId = category.id,
+            description = "설명"
+        )
     }
 
     @Test
-    @DisplayName("getDescriptionByImageId - 설명 정상 반환")
-    fun getDescriptionByImageId_성공() {
+    @DisplayName("getDescriptionByImageId_정상조회")
+    fun getDescriptionByImageId_정상조회() {
         every { imageRepository.findById(1L) } returns Optional.of(image)
 
         val result = imageService.getDescriptionByImageId(1L)
@@ -45,8 +53,8 @@ class ImageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("getDescriptionByImageId - 이미지 없음 예외")
-    fun getDescriptionByImageId_이미지없음() {
+    @DisplayName("getDescriptionByImageId_이미지없음_예외")
+    fun getDescriptionByImageId_이미지없음_예외() {
         every { imageRepository.findById(99L) } returns Optional.empty()
 
         val exception = assertFailsWith<IllegalStateException> {
@@ -57,14 +65,15 @@ class ImageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("getDescriptionByImageId - 설명 null 예외")
-    fun getDescriptionByImageId_설명없음() {
+    @DisplayName("getDescriptionByImageId_설명없음_예외")
+    fun getDescriptionByImageId_설명없음_예외() {
         val imageWithoutDesc = Image.of(
             name = "NoDesc",
             path = "/no.jpg",
-            categoryId = 1L,
+            categoryId = category.id,
             description = null
         )
+
         every { imageRepository.findById(1L) } returns Optional.of(imageWithoutDesc)
 
         val exception = assertFailsWith<IllegalStateException> {
@@ -75,13 +84,10 @@ class ImageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findAll - 전체 이미지 + 카테고리명 매핑")
-    fun findAll_성공() {
-        val categoryMap = mapOf(1L to "여행")
+    @DisplayName("findAll_카테고리명_매핑_정상")
+    fun findAll_카테고리명_매핑_정상() {
         every { imageRepository.findAll() } returns listOf(image)
-        every { categoryRepository.findAll() } returns listOf(
-            Category.of(name = "여행")
-        )
+        every { categoryRepository.findAll() } returns listOf(category)
 
         val result: List<ImageResponseDto> = imageService.findAll()
 
@@ -91,7 +97,7 @@ class ImageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findById - 정상 조회")
+    @DisplayName("findById_정상조회")
     fun findById_정상조회() {
         every { imageRepository.findById(1L) } returns Optional.of(image)
 
@@ -101,8 +107,8 @@ class ImageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findById - 이미지 없음 예외 발생")
-    fun findById_예외() {
+    @DisplayName("findById_이미지없음_예외")
+    fun findById_이미지없음_예외() {
         every { imageRepository.findById(999L) } returns Optional.empty()
 
         val exception = assertFailsWith<IllegalArgumentException> {

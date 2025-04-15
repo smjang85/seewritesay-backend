@@ -13,8 +13,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import kotlin.test.assertNotNull
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 class ImageControllerIntgTest {
 
@@ -36,7 +36,8 @@ class ImageControllerIntgTest {
     }
 
     @Test
-    fun `전체 이미지 목록 조회 성공`() {
+    fun getAllImages_전체이미지목록조회성공() {
+        // when
         val response = webTestClient.get()
             .uri("/api/v1/images")
             .accept(MediaType.APPLICATION_JSON)
@@ -46,6 +47,7 @@ class ImageControllerIntgTest {
             .returnResult()
             .responseBody
 
+        // then
         println("✅ 이미지 목록 응답: $response")
         assertNotNull(response)
     }

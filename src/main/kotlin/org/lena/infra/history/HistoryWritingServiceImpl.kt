@@ -1,5 +1,6 @@
 package org.lena.infra.history
 
+import mu.KLogging
 import org.lena.api.dto.history.HistoryWritingResponseDto
 import org.lena.domain.history.entity.HistoryWriting
 import org.lena.domain.history.repository.HistoryWritingRepository
@@ -16,6 +17,8 @@ class HistoryWritingServiceImpl(
     private val imageService: ImageService,
     private val categoryService: CategoryService
 ) : HistoryWritingService {
+
+    companion object : KLogging()
 
     override fun getHistory(userId: Long, imageId: Long?): List<HistoryWritingResponseDto> {
         val historyList = if (imageId != null) {
@@ -45,6 +48,8 @@ class HistoryWritingServiceImpl(
         sentence: String,
         grade: String
     ): HistoryWritingResponseDto {
+        logger.debug("saveHistory start ")
+
         val user = userService.findById(userId)
         val image = imageService.findById(imageId)
         val category = categoryService.findById(image.categoryId)
@@ -66,6 +71,7 @@ class HistoryWritingServiceImpl(
             historyWritingRepository.save(entity)
         }
 
+        logger.debug("saveHistory saved : $saved")
         return saved.toDto(category?.name ?: "Unknown Category")
     }
 

@@ -1,0 +1,9 @@
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    url: "https://api.openai.com/v1/chat/completions"
+
+azure:
+  speech:
+    key: ${AZURE_SPEECH_KEY}
+    region: ${AZURE_SPEECH_REGION}

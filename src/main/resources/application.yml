@@ -6,78 +6,22 @@ spring:
   application:
     name: see-write-say
 
-  datasource:
-    driverClassName: ${DATASOURCE_DRIVER_CLASSNAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+  config:
+    import: >
+      optional:classpath:code/nickname-words.yml,
+      optional:classpath:environment/api-keys.yml,
+      optional:classpath:environment/db-settings.yml,
+      optional:classpath:environment/security-settings.yml,
+      optional:classpath:environment/management-settings.yml
 
-  jpa:
-    database-platform: ${DATABASE_PLATFORM}
-    ddl-auto: validate
-    generate-ddl: true
-    show-sql: true
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
-        jdbc:
-          lob:
-            non_contextual_creation: true
-
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: ${GOOGLE_REDIRECT_URI}
-            scope:
-              - profile
-              - email
-        provider:
-          google:
-            authorization-uri: "https://accounts.google.com/o/oauth2/auth"
-            token-uri: "https://oauth2.googleapis.com/token"
-            user-info-uri: "https://www.googleapis.com/oauth2/v3/userinfo"
-            user-name-attribute: "sub"
-
-jwt:
-  secret: ${JWT_SECRET}
-  validity-ms: ${JWT_VALIDITY_MS}
-
-openai:
-  api:
-    key: ${OPENAI_API_KEY}
-    url: "https://api.openai.com/v1/chat/completions"
-
-logging:
-  level:
-    root: INFO
-    org.lena: DEBUG
-    org.springframework.web: WARN
-
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-
-cors:
-  allowed-origins:
-    - ${CORS_ALLOWED_ORIGINS_PROD}
-    - ${CORS_ALLOWED_ORIGINS_LOCAL}
 ---
 spring:
-  config:
-    activate:
-      on-profile: prod
+  config.activate.on-profile: prod
   datasource:
     url: ${DATASOURCE_URL}
 
 ---
 spring:
-  config:
-    activate:
-      on-profile: local
+  config.activate.on-profile: local
   datasource:
     url: ${DATASOURCE_URL}

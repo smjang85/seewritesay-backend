@@ -10,74 +10,103 @@ import org.lena.domain.history.repository.HistoryWritingRepository
 import org.lena.domain.image.entity.Category
 import org.lena.domain.image.entity.Image
 import org.lena.domain.image.service.CategoryService
+import org.lena.domain.image.service.ImageService
 import org.lena.domain.user.entity.User
+import org.lena.domain.user.service.UserService
 import org.lena.infra.history.HistoryWritingServiceImpl
-import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class HistoryWritingServiceUnitTest {
 
     private lateinit var historyWritingService: HistoryWritingServiceImpl
+
     private val historyWritingRepository: HistoryWritingRepository = mockk()
+    private val userService: UserService = mockk()
+    private val imageService: ImageService = mockk()
     private val categoryService: CategoryService = mockk()
 
     private val user = User.of(email = "test@lena.org", name = "테스트유저")
-    private val image = Image.of(name = "이미지", path = "/img.jpg", categoryId = 1, description = "설명")
+    private val image = Image.of(name = "이미지", path = "/img.jpg", categoryId = 1L, description = "설명")
 
     @BeforeEach
-    fun setUp() {
-        historyWritingService = HistoryWritingServiceImpl(historyWritingRepository, categoryService)
-        clearMocks(historyWritingRepository, categoryService)
+    fun setup() {
+        historyWritingService = HistoryWritingServiceImpl(
+            historyWritingRepository,
+            userService,
+            imageService,
+            categoryService
+        )
+        clearMocks(historyWritingRepository, userService, imageService, categoryService)
     }
 
     @Test
-    @DisplayName("getHistory - 이미지 ID 없이 전체 조회")
+    @DisplayName("getHistory - 전체 조회 성공")
     fun getHistory_전체조회() {
-        val history = HistoryWriting.of(user, image, sentence = "문장1", category = "여행")
-        every { historyWritingRepository.findAllByUserId(user.id!!) } returns listOf(history)
+        val history = HistoryWriting.of(user, image, sentence = "문장1", grade = "A", category = "여행")
+        every { historyWritingRepository.findAllByUserId(1L) } returns listOf(history)
+        every { categoryService.findNameById(image.categoryId) } returns "여행"
 
-        val result = historyWritingService.getHistory(user, null)
+        val result = historyWritingService.getHistory(userId = 1L, imageId = null)
 
         assertEquals(1, result.size)
         assertEquals("문장1", result[0].sentence)
+        assertEquals("여행", result[0].categoryName)
     }
 
     @Test
-    @DisplayName("getHistory - 특정 이미지 ID 조회")
-    fun getHistory_이미지ID조회() {
-        val history = HistoryWriting.of(user, image, sentence = "문장2", category = "가족")
-        every { historyWritingRepository.findAllByUserIdAndImageId(user.id!!, image.id!!) } returns listOf(history)
+    @DisplayName("getHistory - 특정 이미지 조회 성공")
+    fun getHistory_이미지조회() {
+        val history = HistoryWriting.of(user, image, sentence = "문장2", grade = "B", category = "가족")
+        every { historyWritingRepository.findAllByUserIdAndImageId(1L, 2L) } returns listOf(history)
+        every { categoryService.findNameById(image.categoryId) } returns "가족"
 
-        val result = historyWritingService.getHistory(user, image.id)
+        val result = historyWritingService.getHistory(userId = 1L, imageId = 2L)
 
         assertEquals(1, result.size)
         assertEquals("문장2", result[0].sentence)
+        assertEquals("가족", result[0].categoryName)
     }
 
     @Test
-    @DisplayName("saveHistory - 저장 성공")
-    fun saveHistory_저장성공() {
+    @DisplayName("saveHistory - 새로 저장")
+    fun saveHistory_신규저장() {
+        every { userService.findById(1L) } returns user
+        every { imageService.findById(2L) } returns image
         every { categoryService.findById(image.categoryId) } returns Category.of(name = "학교")
+        every { historyWritingRepository.findByUserIdAndImageId(1L, 2L) } returns null
         every { historyWritingRepository.save(any()) } answers { firstArg() }
 
-        val result = historyWritingService.saveHistory(user, image, "테스트 문장")
+        val result = historyWritingService.saveHistory(1L, 2L, "테스트 문장", "A")
 
         assertEquals("테스트 문장", result.sentence)
-        assertEquals(image.id, result.imageId)
         assertEquals("학교", result.categoryName)
+        assertEquals(2L, result.imageId)
     }
 
     @Test
-    @DisplayName("getUserHistoryWithCategory - 카테고리 포함 전체 조회")
-    fun getUserHistoryWithCategory_전체조회() {
-        val history = HistoryWriting.of(user, image, sentence = "문장3", category = "가족")
-        every { historyWritingRepository.findAllByUserId(user.id!!) } returns listOf(history)
-        every { categoryService.findNameById(image.categoryId) } returns "가족"
+    @DisplayName("getUserHistoryWithCategory - 전체 조회 성공")
+    fun getUserHistoryWithCategory_성공() {
+        val history = HistoryWriting.of(user, image, sentence = "문장3", grade = "A", category = "자연")
+        every { historyWritingRepository.findAllByUserId(1L) } returns listOf(history)
+        every { categoryService.findNameById(image.categoryId) } returns "자연"
 
-        val result = historyWritingService.getUserHistoryWithCategory(user)
+        val result = historyWritingService.getUserHistoryWithCategory(1L)
 
         assertEquals(1, result.size)
-        assertEquals("가족", result[0].categoryName)
+        assertEquals("자연", result[0].categoryName)
+    }
+
+    @Test
+    @DisplayName("deleteHistoryById - 정상 삭제")
+    fun deleteHistoryById_성공() {
+        val history = HistoryWriting.of(user, image, sentence = "문장4", grade = "A", category = "기타")
+        every { userService.findById(1L) } returns user
+        every { historyWritingRepository.findByIdAndUser(10L, user) } returns history
+        every { historyWritingRepository.delete(history) } just Runs
+
+        historyWritingService.deleteHistoryById(1L, 10L)
+
+        verify { historyWritingRepository.delete(history) }
     }
 }

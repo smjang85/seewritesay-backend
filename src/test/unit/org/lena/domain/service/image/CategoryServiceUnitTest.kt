@@ -24,8 +24,8 @@ class CategoryServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findAll - 전체 카테고리 조회 성공")
-    fun findAll_성공() {
+    @DisplayName("findAll_카테고리_전체조회_성공")
+    fun findAll_카테고리_전체조회_성공() {
         every { categoryRepository.findAll() } returns listOf(category)
 
         val result = categoryService.findAll()
@@ -35,8 +35,8 @@ class CategoryServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findByName - 이름으로 카테고리 조회 성공")
-    fun findByName_성공() {
+    @DisplayName("findByName_이름기반_조회_성공")
+    fun findByName_이름기반_조회_성공() {
         every { categoryRepository.findByName("여행") } returns category
 
         val result = categoryService.findByName("여행")
@@ -46,18 +46,21 @@ class CategoryServiceUnitTest {
     }
 
     @Test
-    @DisplayName("save - 카테고리 저장 성공")
-    fun save_성공() {
-        every { categoryRepository.save(category) } returns category
+    @DisplayName("save_카테고리명으로_저장_성공")
+    fun save_카테고리명으로_저장_성공() {
+        val inputName = "여행"
+        val categoryToSave = Category.of(inputName)
 
-        val result = categoryService.save(category)
+        every { categoryRepository.save(any()) } returns categoryToSave
 
-        assertEquals(category, result)
+        val result = categoryService.save(inputName)
+
+        assertEquals(inputName, result.name)
     }
 
     @Test
-    @DisplayName("findById - ID로 카테고리 조회 성공")
-    fun findById_성공() {
+    @DisplayName("findById_아이디기반_조회_성공")
+    fun findById_아이디기반_조회_성공() {
         every { categoryRepository.findById(1L) } returns Optional.of(category)
 
         val result = categoryService.findById(1L)
@@ -66,8 +69,8 @@ class CategoryServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findById - 존재하지 않으면 예외 발생")
-    fun findById_예외() {
+    @DisplayName("findById_존재하지않으면_예외")
+    fun findById_존재하지않으면_예외() {
         every { categoryRepository.findById(99L) } returns Optional.empty()
 
         val exception = assertFailsWith<IllegalArgumentException> {
@@ -78,12 +81,22 @@ class CategoryServiceUnitTest {
     }
 
     @Test
-    @DisplayName("findNameById - 이름 조회 성공")
-    fun findNameById_성공() {
+    @DisplayName("findNameById_이름_문자열만_조회_성공")
+    fun findNameById_이름_문자열만_조회_성공() {
         every { categoryRepository.findNameById(1L) } returns "여행"
 
         val result = categoryService.findNameById(1L)
 
         assertEquals("여행", result)
+    }
+
+    @Test
+    @DisplayName("findNameById_존재하지않으면_null")
+    fun findNameById_존재하지않으면_null() {
+        every { categoryRepository.findNameById(999L) } returns null
+
+        val result = categoryService.findNameById(999L)
+
+        assertNull(result)
     }
 }

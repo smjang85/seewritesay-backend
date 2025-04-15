@@ -1,0 +1,7 @@
+nickname:
+  korean:
+    adjectives: ["귀여운", "파란", "웃는", "똑똑한", "빠른"]
+    animals: ["여우", "고양이", "펭귄", "토끼", "강아지"]
+  english:
+    adjectives: ["Happy", "Blue", "Smiling", "Smart", "Fast"]
+    animals: ["Fox", "Cat", "Penguin", "Rabbit", "Dog"]

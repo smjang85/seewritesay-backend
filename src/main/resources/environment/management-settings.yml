@@ -1,0 +1,22 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"  # 필요 시 metrics, prometheus 등 추가 가능
+  endpoint:
+    health:
+      show-details: always
+  security:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.lena: DEBUG
+    org.springframework.web: WARN
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

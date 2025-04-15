@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import org.junit.jupiter.api.Test
 import kotlin.test.*
+import org.junit.jupiter.api.Test
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -37,14 +37,20 @@ class UserFeedbackRepositoryIntgTest {
         imageRepository.deleteAll()
 
         user = userRepository.save(User.of(email = "test@lena.org", name = "테스트 유저"))
-        image = imageRepository.save(Image.of(name = "테스트 이미지", path = "/test.jpg", categoryId = 1))
+        image = imageRepository.save(Image.of(name = "샘플 이미지", path = "/test.jpg", categoryId = 1))
     }
 
     @Test
-    @DisplayName("findByUserAndImage_정상조회_성공")
-    fun findByUserAndImage_정상조회_성공() {
+    @DisplayName("findByUserAndImage_피드백_정상조회")
+    fun findByUserAndImage_피드백_정상조회() {
         // given
-        val feedback = UserFeedback.of(user, image, remainingCount = 3, createdBy = "test")
+        val feedback = UserFeedback.of(
+            user = user,
+            image = image,
+            writing_remaining_count = 3,
+            reading_remaining_count = 2,
+            createdBy = "test"
+        )
         userFeedbackRepository.save(feedback)
 
         // when
@@ -52,44 +58,53 @@ class UserFeedbackRepositoryIntgTest {
 
         // then
         assertAll(
-            "정상적으로 피드백을 조회해야 함",
             { assertNotNull(found) },
-            { assertEquals(3, found?.remainingCount) }
+            { assertEquals(3, found?.writing_remaining_count) },
+            { assertEquals(2, found?.reading_remaining_count) }
         )
     }
 
     @Test
-    @DisplayName("findByUserAndImage_존재하지_않으면_null_반환")
-    fun findByUserAndImage_존재하지_않으면_null_반환() {
+    @DisplayName("findByUserAndImage_없는경우_null반환")
+    fun findByUserAndImage_없는경우_null반환() {
+        // when
         val result = userFeedbackRepository.findByUserAndImage(user, image)
+
+        // then
         assertNull(result)
     }
 
     @Test
-    @DisplayName("save_동일_유저와_이미지로_덮어쓰기_불가_확인")
-    fun save_동일_유저와_이미지로_덮어쓰기_불가_확인() {
+    @DisplayName("save_동일유저이미지_중복저장")
+    fun save_동일유저이미지_중복저장() {
         // given
-        val initial = UserFeedback.of(user, image, remainingCount = 5, createdBy = "init")
-        userFeedbackRepository.save(initial)
+        val feedback1 = UserFeedback.of(user, image, 3, 1, "first")
+        val feedback2 = UserFeedback.of(user, image, 2, 0, "second")
+        userFeedbackRepository.save(feedback1)
 
-        // when - ID 없이 저장 → Unique 제약 조건으로는 막지 않음
-        val updated = UserFeedback.of(user, image, remainingCount = 2, createdBy = "update")
-        userFeedbackRepository.save(updated)
+        // when - unique 제약조건이 없으면 덮어쓰기 되지 않음
+        assertFailsWith<Exception> {
+            userFeedbackRepository.save(feedback2)
+        }
 
         // then
-        val results = userFeedbackRepository.findAll()
-        assertEquals(2, results.size, "중복 방지 로직이 없다면 두 개가 저장됨")
+        val all = userFeedbackRepository.findAll()
+        assertEquals(1, all.size)
     }
 
     @Test
-    @DisplayName("remainingCount_경계값_테스트")
-    fun remainingCount_경계값_테스트() {
-        val feedback = UserFeedback.of(user, image, remainingCount = 0, createdBy = "tester")
+    @DisplayName("save_remainingCount_경계값_0")
+    fun save_remainingCount_경계값_0() {
+        // given
+        val feedback = UserFeedback.of(user, image, 0, 0, "test")
+
+        // when
         val saved = userFeedbackRepository.save(feedback)
 
+        // then
         assertAll(
-            "0도 정상 저장되어야 함",
-            { assertEquals(0, saved.remainingCount) },
+            { assertEquals(0, saved.writing_remaining_count) },
+            { assertEquals(0, saved.reading_remaining_count) },
             { assertNotNull(saved.id) }
         )
     }

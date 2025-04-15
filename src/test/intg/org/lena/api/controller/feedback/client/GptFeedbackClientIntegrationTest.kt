@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.lena.api.common.dto.ApiResponse
-import org.lena.api.dto.feedback.GptFeedbackRequestDto
+import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackRequestDto
 
 import org.lena.domain.image.entity.Image
 import org.lena.domain.image.repository.ImageRepository
@@ -99,7 +99,7 @@ class GptFeedbackIntegrationTest {
         println("────────────────────────────")
 
         sentenceGradeMap.entries.forEachIndexed { index, (sentence, expectedGrade) ->
-            val request = GptFeedbackRequestDto(sentence = sentence, imageId = 1)
+            val request = AiWritingFeedbackRequestDto(sentence = sentence, imageId = 1)
 
             val response = webTestClient.post()
                 .uri("/api/v1/ai/feedback/generate")

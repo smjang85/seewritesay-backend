@@ -12,7 +12,7 @@ services:
     volumes:
       - ${DOCKER_DB_POSTGRES_VOLUMES}
 
-  app:
+  seewritesay-app:
     build:
       context: .
     container_name: ${DOCKER_APP_CONTAINER_NAME}

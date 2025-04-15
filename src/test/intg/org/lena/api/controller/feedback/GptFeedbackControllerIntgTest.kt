@@ -3,7 +3,7 @@ package org.lena.api.controller.feedback
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.lena.api.common.dto.ApiResponse
-import org.lena.api.dto.feedback.GptFeedbackRequestDto
+import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackRequestDto
 import org.lena.domain.image.entity.Image
 import org.lena.domain.image.repository.ImageRepository
 import org.lena.domain.user.entity.User
@@ -39,19 +39,19 @@ class GptFeedbackControllerIntgTest {
 
         testUser = userRepository.save(User.of(email = "test@example.com", name = "테스트유저"))
         testImage = imageRepository.save(
-            Image(
+            Image.of(
                 name = "샘플 이미지",
                 path = "/images/sample.jpg",
-                description = "샘플 설명",
-                categoryId = 1
+                categoryId = 1,
+                description = "샘플 설명"
             )
         )
     }
 
     @Test
-    fun `GPT 피드백 생성 요청 - 성공`() {
+    fun generateFeedback_피드백_생성_성공() {
         // given
-        val request = GptFeedbackRequestDto(
+        val request = AiWritingFeedbackRequestDto(
             sentence = "This is a test sentence.",
             imageId = testImage.id!!
         )
@@ -59,7 +59,7 @@ class GptFeedbackControllerIntgTest {
         // when
         val result = webTestClient.post()
             .uri("/api/v1/ai/feedback/generate")
-            .headers { it.setBasicAuth(testUser.email, "dummy") } // 실제 JWT 처리 시 대체 필요
+            .headers { it.setBasicAuth(testUser.email, "dummy") } // 실제 JWT 인증으로 교체 필요
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
             .exchange()
@@ -68,13 +68,13 @@ class GptFeedbackControllerIntgTest {
             .returnResult()
             .responseBody
 
-        println("✅ GPT 생성 결과: $result")
+        println("✅ GPT 피드백 생성 결과: $result")
     }
 
     @Test
-    fun `GPT 피드백 저장 요청 - 성공`() {
+    fun submitFeedback_피드백_저장_성공() {
         // given
-        val request = GptFeedbackRequestDto(
+        val request = AiWritingFeedbackRequestDto(
             sentence = "Another feedback to save.",
             imageId = testImage.id!!
         )
@@ -94,21 +94,23 @@ class GptFeedbackControllerIntgTest {
     }
 
     @Test
-    fun `인증 없는 요청 - 실패`() {
-        val request = GptFeedbackRequestDto(
+    fun generateFeedback_인증_없음_실패() {
+        // given
+        val request = AiWritingFeedbackRequestDto(
             sentence = "Should fail",
             imageId = testImage.id!!
         )
 
+        // when
         webTestClient.post()
             .uri("/api/v1/ai/feedback/generate")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
             .exchange()
-            .expectStatus().is4xxClientError
+            .expectStatus().isUnauthorized
             .expectBody()
             .consumeWith {
-                println("❌ 인증 실패 테스트 성공")
+                println("❌ 인증 실패 정상 처리됨")
             }
     }
 }

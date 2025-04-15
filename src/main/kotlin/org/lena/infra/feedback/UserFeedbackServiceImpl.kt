@@ -1,6 +1,7 @@
 package org.lena.infra.feedback
 
-import org.lena.api.dto.feedback.UserFeedbackResponseDto
+import mu.KLogging
+import org.lena.api.dto.feedback.user.UserFeedbackResponseDto
 import org.lena.domain.feedback.entity.UserFeedback
 import org.lena.domain.feedback.repository.UserFeedbackRepository
 import org.lena.domain.feedback.service.UserFeedbackService
@@ -16,9 +17,15 @@ class UserFeedbackServiceImpl(
     private val imageService: ImageService,
 ) : UserFeedbackService {
 
+    companion object : KLogging()
+
     override fun getRemainingCount(userId: Long, imageId: Long): UserFeedbackResponseDto {
+        logger.debug("getRemainingCount start")
+
         val user = userService.findById(userId)
+        logger.debug("getRemainingCount user: $user")
         val image = imageService.findById(imageId)
+        logger.debug("getRemainingCount image: $image")
 
         val userFeedback = userFeedbackRepository.findByUserAndImage(user, image)
             ?: UserFeedback.of(
@@ -28,10 +35,8 @@ class UserFeedbackServiceImpl(
                 reading_remaining_count = 2
             )
 
-        return UserFeedbackResponseDto(
-            writingRemainingCount = userFeedback.writing_remaining_count,
-            readingRemainingCount = userFeedback.reading_remaining_count
-        )
+        logger.debug("getRemainingCount userFeedback: $userFeedback")
+        return UserFeedbackResponseDto.fromEntity(userFeedback)
     }
 
     @Transactional

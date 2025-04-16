@@ -110,6 +110,12 @@ Grade: A+,A,B,C,D,F 중 하나
         logger.debug("feedback : $feedback")
         logger.debug("grade : $grade")
 
+        val finalCorrection = if (correction == "없음" && grade != "F") {
+            imageDesc
+        } else {
+            correction
+        }
+
         return AiWritingFeedbackResponseDto(
             correction = correction,
             feedback = feedback,

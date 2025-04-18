@@ -117,7 +117,7 @@ Grade: A+,A,B,C,D,F 중 하나
         }
 
         return AiWritingFeedbackResponseDto(
-            correction = correction,
+            correction = finalCorrection,
             feedback = feedback,
             grade = grade
         )

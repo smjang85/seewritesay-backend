@@ -12,4 +12,5 @@ interface UserService {
     fun generateUniqueNickname(): String
     fun updateProfile(userId: Long, nickname: String, avatar: String, ageGroup: AgeGroup)
     fun getCurrentUserProfile(userId: Long): UserProfileResponseDto
+    fun deleteUserById(userId: Long)
 }

@@ -3,6 +3,8 @@ package org.lena.infra.user
 import mu.KotlinLogging
 import org.lena.api.dto.user.UserProfileResponseDto
 import org.lena.config.properties.user.NicknameProperties
+import org.lena.domain.feedback.repository.UserFeedbackRepository
+import org.lena.domain.history.repository.HistoryWritingRepository
 import org.lena.domain.user.entity.User
 import org.lena.domain.user.enums.AgeGroup
 import org.lena.domain.user.repository.UserRepository
@@ -14,6 +16,8 @@ import java.time.LocalDateTime
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
+    private val historyWritingRepository: HistoryWritingRepository,
+    private val userFeedbackRepository: UserFeedbackRepository,
     private val nicknameProperties: NicknameProperties
 ) : UserService {
 
@@ -118,5 +122,17 @@ class UserServiceImpl(
             avatar = user.avatar,
             ageGroup = user.ageGroup
         )
+    }
+
+    @Transactional
+    override fun deleteUserById(userId: Long) {
+        // 1. 사용자의 작성 히스토리 삭제
+        historyWritingRepository.deleteByUserId(userId)
+
+        // 2. 사용자 피드백 정보 삭제
+        userFeedbackRepository.deleteByUserId(userId)
+
+        // 3. 사용자 계정 삭제
+        userRepository.deleteById(userId)
     }
 }

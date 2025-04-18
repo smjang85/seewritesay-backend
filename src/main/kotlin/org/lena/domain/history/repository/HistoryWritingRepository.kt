@@ -11,4 +11,5 @@ interface HistoryWritingRepository : JpaRepository<HistoryWriting, Long> {
     fun findAllByUserIdAndImageId(userId: Long, imageId: Long): List<HistoryWriting>
     fun findByUserIdAndImageId(userId: Long, imageId: Long): HistoryWriting?
     fun findByIdAndUser(id: Long, user: User): HistoryWriting?
+    fun deleteByUserId(userId: Long)
 }

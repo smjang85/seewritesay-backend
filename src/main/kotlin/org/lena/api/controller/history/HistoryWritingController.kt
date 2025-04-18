@@ -68,6 +68,8 @@ class HistoryWritingController(
 
         val response = writingHistoryService.getUserHistoryWithCategory(user.id)
 
+
+        logger.debug { "GET /history/writing/with-category | response=${response.toString()}" }
         return ResponseEntity.ok(ApiResponse.Companion.success(response, "카테고리별 작문 히스토리 조회 성공"))
     }
 

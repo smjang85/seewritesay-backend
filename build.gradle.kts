@@ -76,7 +76,16 @@ kotlin {
     }
 }
 
+tasks.withType<ProcessResources> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 sourceSets {
+    main {
+        resources {
+            srcDirs("src/main/resources")
+        }
+    }
     test {
         java {
             setSrcDirs(listOf("src/test/intg", "src/test/unit"))

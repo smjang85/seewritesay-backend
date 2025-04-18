@@ -68,13 +68,15 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it
                     .requestMatchers(
+                        "/",
+                        "/privacy.html",
+                        "/static/**",
                         "/api/v1/auth/**",
                         "/api/v1/images/**",
                         "/images/**"
                     ).permitAll()
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll() // 헬스, 인포는 오픈
                     .requestMatchers(
-                        "/",
                         "/api/v1/ai/feedback/**",
                         "/api/v1/user/**",
                         "/api/v1/history/**"

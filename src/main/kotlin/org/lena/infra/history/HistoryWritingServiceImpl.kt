@@ -21,12 +21,19 @@ class HistoryWritingServiceImpl(
     companion object : KLogging()
 
     override fun getHistory(userId: Long, imageId: Long?): List<HistoryWritingResponseDto> {
+        logger.debug("getHistory start")
+
         val historyList = if (imageId != null) {
+            logger.debug("getHistory findAllByUserIdAndImageId start")
+
             historyWritingRepository.findAllByUserIdAndImageId(userId, imageId)
         } else {
+            logger.debug("getHistory findAllByUserId start")
+
             historyWritingRepository.findAllByUserId(userId)
         }
 
+        logger.debug("getHistory : ${historyList.toString()}")
         return historyList.map { history ->
             val categoryName = resolveCategoryName(history.image.categoryId, history.category)
             history.toDto(categoryName)

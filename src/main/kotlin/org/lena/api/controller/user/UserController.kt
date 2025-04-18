@@ -12,6 +12,8 @@ import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.user.enums.AgeGroup
 import org.lena.domain.user.service.UserService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -78,5 +80,17 @@ class UserController(
             avatar = request.avatar,
             ageGroup = AgeGroup.ofCode(request.ageGroup)
         )
+    }
+
+
+    @DeleteMapping("/delete")
+    fun deleteMyAccount(
+        @CurrentUser user: CustomUserPrincipal?
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        requireNotNull(user) { "인증된 사용자가 없습니다." }
+
+        userService.deleteUserById(user.id)
+
+        return ResponseEntity.ok(ApiResponse.success(message = "회원 탈퇴가 완료되었습니다."))
     }
 }

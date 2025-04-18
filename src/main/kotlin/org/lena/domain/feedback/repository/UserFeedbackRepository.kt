@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserFeedbackRepository : JpaRepository<UserFeedback, Long> {
     fun findByUserAndImage(user: User, image: Image): UserFeedback?
+    fun deleteByUserId(userId: Long)
 }

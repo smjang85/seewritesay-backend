@@ -14,6 +14,9 @@ spring:
       optional:classpath:environment/security-settings.yml,
       optional:classpath:environment/management-settings.yml
 
+  web:
+    resources:
+      static-locations: classpath:/static/
 ---
 spring:
   config.activate.on-profile: prod

@@ -100,3 +100,6 @@ application-test.yml
 /*.iml
 
 src/main/resources/firebase-service-account.json
+deploy.sh
+tail-log.sh
+firebase-service-account.json

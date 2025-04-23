@@ -28,14 +28,14 @@ class OAuth2SuccessHandler(
     ) {
         val oAuth2User = authentication.principal as OAuth2User
         val email = oAuth2User.attributes["email"] as String
-        val name = oAuth2User.attributes["name"] as String
+        //val name = oAuth2User.attributes["name"] as String
 
 
 
         // ✅ 최종 로그인 일시 업데이트
-        val user = userService.registerOrUpdate(email, name)
+        val user = userService.registerOrUpdate(email)
 
-        logger.debug("✅ 구글 로그인 성공: $user.id , name: $name ($email)")
+        logger.debug("✅ 구글 로그인 성공: $user.id , name:  ($email)")
 
 
         val jwt = jwtTokenService.createToken(user)

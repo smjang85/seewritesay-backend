@@ -18,21 +18,29 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        logger.debug("🛂 JWT 필터 동작 시작")
+        logger.debug("🛂 JWT 필터 동작 시작 : ${request.requestURI}")
 
-        // Authorization 헤더에서 Bearer 토큰 추출
+        // 1. Authorization 헤더 확인
         val authHeader = request.getHeader("Authorization")
-        val token = authHeader?.removePrefix("Bearer ") ?: return filterChain.doFilter(request, response)
+        logger.debug("🔍 Authorization 헤더: $authHeader")
 
-        logger.debug("✅ JWT token: $token")
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.warn("⚠️ Authorization 헤더가 없거나 'Bearer' 접두사가 없음 - 필터 통과")
+            return filterChain.doFilter(request, response)
+        }
+
+        // 2. 토큰 추출
+        val token = authHeader.removePrefix("Bearer ")
+        logger.debug("✅ 추출된 JWT token: $token")
 
         try {
-            // JWT 검증 및 정보 추출
+            // 3. 토큰에서 사용자 정보 추출
             val id = jwtTokenService.extractId(token)
             val email = jwtTokenService.extractEmail(token)
             val name = jwtTokenService.extractName(token)
 
-            // 만약 토큰이 만료되었으면, 유효하지 않다고 처리
+            logger.debug("🧬 토큰에서 추출된 정보 - id: $id, email: $email, name: $name")
+
             if (jwtTokenService.isTokenExpired(token)) {
                 logger.warn("❌ JWT 만료됨: $token")
                 response.status = HttpServletResponse.SC_UNAUTHORIZED
@@ -40,9 +48,9 @@ class JwtAuthenticationFilter(
                 return
             }
 
-            // JWT 인증 성공, 사용자 정보를 기반으로 인증 객체 생성
-            logger.debug("✅ JWT 인증 성공 id: $id, email: $email")
+            logger.debug("✅ JWT 인증 성공")
 
+            // 4. 인증 객체 생성 및 컨텍스트에 설정
             val user = CustomUserPrincipal(
                 id = id ?: 0L,
                 name = name ?: "사용자",
@@ -53,14 +61,15 @@ class JwtAuthenticationFilter(
             SecurityContextHolder.getContext().authentication = auth
 
         } catch (e: Exception) {
-            // 예외 처리 (JWT 파싱 실패, 잘못된 토큰 등)
-            logger.error("❌ JWT 검증 실패: ${e.message}")
+            logger.error("❌ JWT 검증 실패: ${e.message}", e)
             response.status = HttpServletResponse.SC_UNAUTHORIZED
             response.writer.write("유효하지 않은 토큰입니다.")
             return
         }
 
-        // 인증이 완료되면 필터 체인 진행
+        // 5. 다음 필터로 진행
+        logger.debug("➡️ 인증 완료, 필터 체인 진행")
         filterChain.doFilter(request, response)
     }
+
 }

@@ -26,6 +26,12 @@ class User private constructor(
     @Column(name = "age_group", length = 1)
     var ageGroup: String? = null,
 
+    @Column(name = "writing_remaining_count", nullable = false)
+    var writingRemainingCount: Int = 30,
+
+    @Column(name = "reading_remaining_count", nullable = false)
+    var readingRemainingCount: Int = 5,
+
     @Column(name = "last_login_at")
     var lastLoginAt: LocalDateTime? = null,
 
@@ -46,17 +52,22 @@ class User private constructor(
         fun of(
             email: String,
             name: String? = null,
+            writingRemainingCount: Int,
+            readingRemainingCount: Int,
             lastLoginAt: LocalDateTime? = null,
             createdBy: String? = null
         ): User {
             return User(
                 email = email,
                 name = name,
+                writingRemainingCount = writingRemainingCount,
+                readingRemainingCount = readingRemainingCount,
                 lastLoginAt = lastLoginAt,
                 createdAt = LocalDateTime.now(),
                 createdBy = createdBy
             )
         }
+
     }
 
     // JPA 기본 생성자
@@ -67,6 +78,8 @@ class User private constructor(
         nickname = null,
         avatar = null,
         ageGroup = null,
+        writingRemainingCount = 30,
+        readingRemainingCount = 5,
         lastLoginAt = null,
         createdAt = LocalDateTime.now(),
         createdBy = null,

@@ -19,6 +19,7 @@ echo "🔨 (1) Gradle 빌드 시작..."
 echo "🛂 (2) 환경 설정 파일 업로드..."
 scp -i "$KEY_PATH" "$ENV_FILE" "$EC2_USER@$EC2_HOST:$REMOTE_APP_DIR/.env"
 
+
 # === 4. JAR 파일 업로드 ===
 echo "🚚 (3) 빌드된 JAR 업로드 중..."
 scp -i "$KEY_PATH" $JAR_PATTERN "$EC2_USER@$EC2_HOST:$REMOTE_APP_DIR/build/libs/"
@@ -32,6 +33,11 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_HOST" << EOF
   echo "🧹 docker-compose down"
   docker-compose down
 
+#(선택) 디스크 공간 확보가 필요할 경우 주석 해제
+#echo "🧹 docker system prune -a -f"
+#docker system prune -a -f
+
+
   echo "🔧 docker-compose build"
   docker-compose build
 
@@ -41,3 +47,4 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_HOST" << EOF
   echo "📄 로그 출력 중 (Ctrl+C로 중단 가능)"
   docker logs -f $DOCKER_APP_NAME
 EOF
+

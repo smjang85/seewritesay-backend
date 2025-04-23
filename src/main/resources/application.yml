@@ -11,6 +11,7 @@ spring:
       optional:classpath:code/nickname-words.yml,
       optional:classpath:environment/api-keys.yml,
       optional:classpath:environment/db-settings.yml,
+      optional:classpath:environment/batch-settings.yml,
       optional:classpath:environment/security-settings.yml,
       optional:classpath:environment/management-settings.yml
 

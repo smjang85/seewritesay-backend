@@ -98,3 +98,5 @@ application-test.yml
 /out/
 /.idea/
 /*.iml
+
+src/main/resources/firebase-service-account.json

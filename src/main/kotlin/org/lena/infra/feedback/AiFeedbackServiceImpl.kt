@@ -1,8 +1,8 @@
 package org.lena.infra.feedback
 
 import mu.KotlinLogging
-import org.lena.api.dto.feedback.ai.reading.AiReadingFeedbackResponseDto
-import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackResponseDto
+import org.lena.api.dto.feedback.reading.AiReadingFeedbackResponseDto
+import org.lena.api.dto.feedback.writing.AiWritingFeedbackResponseDto
 import org.lena.domain.feedback.service.AiFeedbackService
 import org.lena.domain.image.service.ImageService
 import org.lena.infra.feedback.client.AzureReadingFeedbackClient

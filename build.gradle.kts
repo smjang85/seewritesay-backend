@@ -37,7 +37,12 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
     implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.43.0@jar")
+    implementation("com.google.firebase:firebase-admin:9.4.3")
 
+    implementation("com.nimbusds:nimbus-jose-jwt:10.2") // 최신 버전 확인해도 됨
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
 
     // JWT
@@ -58,7 +63,7 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test") // kotlin-test-junit5 제거
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("io.mockk:mockk:1.14.0")
     testImplementation("net.java.dev.jna:jna:5.17.0")
@@ -67,7 +72,7 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    systemProperty("spring.profiles.active", "test") // ✅
+    systemProperty("spring.profiles.active", "test")
 }
 
 kotlin {
@@ -78,6 +83,9 @@ kotlin {
 
 tasks.withType<ProcessResources> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from("src/main/resources/firebase-service-account.json") {
+        into("/")
+    }
 }
 
 sourceSets {
@@ -92,4 +100,3 @@ sourceSets {
         }
     }
 }
-

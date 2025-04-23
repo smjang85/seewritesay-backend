@@ -1,0 +1,9 @@
+user:
+  feedback:
+    reset:
+      schedule: "0 0 0 * * *" # 매일 자정
+      writing-count: 30
+      reading-count: 5
+story:
+  mixed-translation:
+    schedule: "0 0 0 * * *" # 매분 0초마다 실행

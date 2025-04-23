@@ -7,3 +7,7 @@ azure:
   speech:
     key: ${AZURE_SPEECH_KEY}
     region: ${AZURE_SPEECH_REGION}
+
+enabled_services:
+  openai_chat: true
+  azure_speech: true

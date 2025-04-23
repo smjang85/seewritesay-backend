@@ -1,7 +1,7 @@
 package org.lena.domain.feedback.service
 
-import org.lena.api.dto.feedback.ai.reading.AiReadingFeedbackResponseDto
-import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackResponseDto
+import org.lena.api.dto.feedback.reading.AiReadingFeedbackResponseDto
+import org.lena.api.dto.feedback.writing.AiWritingFeedbackResponseDto
 import org.springframework.web.multipart.MultipartFile
 
 interface AiFeedbackService {

@@ -2,7 +2,7 @@
 package org.lena.infra.feedback.client
 
 import mu.KotlinLogging
-import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackResponseDto
+import org.lena.api.dto.feedback.writing.AiWritingFeedbackResponseDto
 import org.lena.domain.feedback.client.AiWritingFeedbackClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -14,7 +14,8 @@ import java.time.Duration
 @Component
 class GptWritingFeedbackClient(
     @Value("\${openai.api.key}") private val apiKey: String,
-    @Value("\${openai.api.url}") private val apiUrl: String
+    @Value("\${openai.api.url}") private val apiUrl: String,
+    @Value("\${enabled_services.openai_chat}") private val enabled_openai_chat: Boolean
 ) : AiWritingFeedbackClient {
 
     private val logger = KotlinLogging.logger {}
@@ -31,6 +32,11 @@ class GptWritingFeedbackClient(
         .build()
 
     override fun generateWritingFeedback(sentence: String, imageDesc: String): AiWritingFeedbackResponseDto {
+        if (!enabled_openai_chat) {
+            logger.warn { "Open API 서비스가 비활성화되어 있습니다." }
+            throw IllegalStateException("Open API 서비스 비활성화됨")
+        }
+
         if (!Regex("[a-zA-Z]").containsMatchIn(sentence)) {
             return AiWritingFeedbackResponseDto("없음", "영어 문장으로 작성해 주세요.", "F")
         }

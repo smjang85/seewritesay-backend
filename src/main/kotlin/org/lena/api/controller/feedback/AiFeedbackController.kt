@@ -4,15 +4,15 @@ import jakarta.validation.Valid
 import mu.KotlinLogging
 import org.lena.api.common.annotation.CurrentUser
 import org.lena.api.common.dto.ApiResponse
-import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackRequestDto
-import org.lena.api.dto.feedback.ai.writing.AiWritingFeedbackResponseDto
+import org.lena.api.dto.feedback.writing.AiWritingFeedbackRequestDto
+import org.lena.api.dto.feedback.writing.AiWritingFeedbackResponseDto
 import org.lena.config.security.CustomUserPrincipal
 import org.lena.domain.feedback.service.AiFeedbackService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.lena.api.dto.feedback.ai.reading.AiReadingFeedbackResponseDto
+import org.lena.api.dto.feedback.reading.AiReadingFeedbackResponseDto
 import org.springframework.web.multipart.MultipartFile
 
 @RestController

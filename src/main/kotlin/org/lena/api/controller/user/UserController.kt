@@ -28,61 +28,6 @@ class UserController(
     private val userService: UserService
 ) {
 
-
-    private val logger = KotlinLogging.logger {}
-
-    @GetMapping("/current-user-profile")
-    fun getCurrentUserProfile(@CurrentUser user: CustomUserPrincipal): ApiResponse<UserProfileResponseDto> {
-        val profile = userService.getCurrentUserProfile(user.id)
-        return ApiResponse.success(profile, "사용자 정보 조회 성공")
-    }
-
-    @GetMapping("/check-nickname")
-    fun checkNickname(
-        @RequestParam nickname: String,
-        @CurrentUser user: CustomUserPrincipal
-    ): ApiResponse<NicknameAvailabilityResponseDto> {
-        requireNotNull(user) { "사용자 정보가 없습니다." }
-        logger.debug("checkNickname start")
-
-        val available = userService.isNicknameAvailable(nickname)
-        return ApiResponse.success(
-            NicknameAvailabilityResponseDto(available),
-            "닉네임 중복 확인 완료"
-        )
-    }
-
-    @GetMapping("/generate-nickname")
-    fun generateRandomNickname(@CurrentUser user: CustomUserPrincipal): ApiResponse<RandomNicknameResponseDto> {
-        requireNotNull(user) { "사용자 정보가 없습니다." }
-        logger.debug("generateRandomNickname start")
-
-        val nickname = userService.generateUniqueNickname()
-        return ApiResponse.success(
-            RandomNicknameResponseDto(nickname),
-            "랜덤 닉네임 생성 완료"
-        )
-    }
-
-
-    @PostMapping("/update-profile")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateProfile(
-        @Valid @RequestBody request: UpdateProfileRequestDto,
-        @CurrentUser user: CustomUserPrincipal
-    ) {
-        requireNotNull(user) { "사용자 정보가 없습니다." }
-        logger.info("updateProfile start")
-
-        userService.updateProfile(
-            userId = user.id,
-            nickname = request.nickname,
-            avatar = request.avatar,
-            ageGroup = AgeGroup.ofCode(request.ageGroup)
-        )
-    }
-
-
     @DeleteMapping("/delete")
     fun deleteMyAccount(
         @CurrentUser user: CustomUserPrincipal?

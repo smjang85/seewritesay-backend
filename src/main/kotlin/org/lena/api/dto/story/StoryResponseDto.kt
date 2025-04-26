@@ -7,9 +7,11 @@ import kotlin.collections.find
 data class StoryResponseDto(
     val id: Long,
     val title: String,
+    val source: String?,
     val content: String,
     val imagePath: String?,
-    val languageCode: String
+    val languageCode: String,
+    val type: String
 ) {
     companion object {
         fun fromEntity(story: Story, language: LanguageCode): StoryResponseDto {
@@ -19,9 +21,11 @@ data class StoryResponseDto(
             return StoryResponseDto(
                 id = story.id,
                 title = translation.title,
+                source = translation.source,
                 content = translation.content,
                 imagePath = story.imagePath,
-                languageCode = translation.languageCode
+                languageCode = translation.languageCode,
+                type = story.type.code
             )
         }
     }

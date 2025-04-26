@@ -6,15 +6,17 @@ import org.lena.api.dto.story.StoryResponseDto
 import org.lena.domain.story.entity.Story
 import org.lena.domain.story.entity.StoryTranslation
 import org.lena.domain.story.enums.LanguageCode
+import org.lena.domain.story.enums.StoryType
+import org.lena.domain.story.projection.StoryListProjection
+import org.lena.domain.story.projection.StoryTranslationProjection
 import org.lena.domain.story.repository.StoryRepository
 import org.lena.domain.story.repository.StoryTranslationRepository
 import org.lena.domain.story.service.StoryService
 import org.lena.domain.story.util.StoryUtils
 import org.lena.domain.story.entity.toDto
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation.REQUIRES_NEW
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.sql.Timestamp
 
 @Service
 class StoryServiceImpl(
@@ -27,28 +29,26 @@ class StoryServiceImpl(
     @Transactional(readOnly = true)
     override fun getAllStories(language: LanguageCode): List<StoryListResponseDto> {
         logger.debug("📘 getAllStories(language = {})", language.code)
-        val rawResults = storyRepository.findAllWithTranslation(language.code)
-
-        return rawResults.map {
-            StoryListResponseDto(
-                id = (it[0] as Number).toLong(),
-                imagePath = it[1] as? String,
-                title = it[2] as? String ?: "",
-                createdAt = (it[3] as Timestamp).toLocalDateTime(),
-                createdBy = it.getOrNull(4) as? String
-            )
-        }
+        return storyRepository.findStoryListProjectionNative(language.code)
+            .map { it.toStoryListResponseDto() }
     }
 
     @Transactional(readOnly = true)
-    override fun getStoryById(id: Long, language: LanguageCode): StoryResponseDto {
+    override fun getStoriesByType(language: LanguageCode, type: String): List<StoryListResponseDto> {
+        val storyType = StoryType.fromCode(type)
+        return storyRepository.findByType(storyType)
+            .map { StoryListResponseDto.fromEntity(it, language) }
+    }
+
+    @Transactional(readOnly = true)
+    override fun getStoryById(id: Long, language: LanguageCode, chapterId: Long?): StoryResponseDto {
         val langCode = language.code
-        logger.debug("📖 getStoryById(id = {}, lang = {})", id, langCode)
+        logger.debug("📖 getStoryById(id = {}, lang = {}, chapterId = {})", id, langCode, chapterId)
 
         return if (isMixedLanguage(langCode)) {
             getMixedLanguageStory(id, langCode)
         } else {
-            getSingleLanguageStory(id, langCode)
+            getSingleLanguageContent(id, langCode, chapterId)
         }
     }
 
@@ -58,19 +58,15 @@ class StoryServiceImpl(
 
     private fun getMixedLanguageStory(id: Long, code: String): StoryResponseDto {
         logger.info("🔎 혼합 언어 번역 조회: storyId=$id, code=$code")
-
-        val existing = storyTranslationRepository.findByStoryIdAndLanguageCode(id, code)
-            ?: throw IllegalArgumentException("혼합 언어 번역이 존재하지 않습니다. ")
-        return existing.toDto()
+        return storyTranslationRepository.findByStoryIdAndLanguageCode(id, code)
+            ?.toDto()
+            ?: throw IllegalArgumentException("혼합 언어 번역이 존재하지 않습니다.")
     }
 
-    @Transactional(propagation = REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun saveMixedLanguageStory(id: Long, code: String): StoryResponseDto {
         val languages = code.split("_").map(String::trim)
-        // 혼합 언어는 정확히 2개만 허용
-        if (languages.size != 2) {
-            throw IllegalArgumentException("혼합 언어는 2개까지만 허용됩니다: $code")
-        }
+        require(languages.size == 2) { "혼합 언어는 2개까지만 허용됩니다: $code" }
 
         val existing = storyTranslationRepository.findByStoryIdAndLanguageCode(id, code)
         if (existing != null) {
@@ -78,11 +74,9 @@ class StoryServiceImpl(
             return existing.toDto()
         }
 
-
-        val (lang1, lang2) = code.split("_").map(String::trim)
-
-        val trans1 = getTranslationFromRaw(id, lang1)
-        val trans2 = getTranslationFromRaw(id, lang2)
+        val (lang1, lang2) = languages
+        val trans1 = findTranslationEntity(id, lang1)
+        val trans2 = findTranslationEntity(id, lang2)
 
         val mixedContent = StoryUtils.sentenceMix(trans1.content, trans2.content)
 
@@ -98,27 +92,36 @@ class StoryServiceImpl(
         return newTranslation.toDto()
     }
 
-    private fun getSingleLanguageStory(id: Long, code: String): StoryResponseDto {
-        logger.debug("getSingleLanguageStory id= $id, code=$code")
-        val translation = getTranslationFromRaw(id, code)
-        return translation.toDto()
+    private fun getSingleLanguageContent(storyId: Long, language: String, chapterId: Long?): StoryResponseDto {
+        return findTranslationEntity(storyId, language, chapterId).toDto()
     }
 
-    private fun getTranslationFromRaw(storyId: Long, language: String): StoryTranslation {
-        val result = storyRepository.findByIdWithTranslation(storyId, language)
-            ?: throw IllegalArgumentException("$language 번역이 존재하지 않습니다.")
+    private fun findTranslationEntity(storyId: Long, language: String, chapterId: Long? = null): StoryTranslation {
+        return storyRepository.findTranslation(storyId, language, chapterId)
+            .orElseThrow { IllegalArgumentException("번역이 존재하지 않습니다.") }
+            .toEntity()
+    }
 
-        val row = result as? Array<Any>
-            ?: throw IllegalStateException("Unexpected native query result type")
+    private fun StoryListProjection.toStoryListResponseDto(): StoryListResponseDto {
+        return StoryListResponseDto(
+            id = getId(),
+            imagePath = getImagePath(),
+            type = getType() ?: "",
+            title = getTitle(),
+            createdAt = getCreatedAt(),
+            createdBy = getCreatedBy()
+        )
+    }
 
+    private fun StoryTranslationProjection.toEntity(): StoryTranslation {
         return StoryTranslation(
-            id = (row[0] as Number).toLong(),
-            story = Story(id = (row[1] as Number).toLong()),
-            languageCode = row[2] as String,
-            title = row[3] as String,
-            content = row[4] as String,
-            createdAt = (row[5] as? Timestamp)?.toLocalDateTime() ?: throw IllegalStateException("createdAt 누락"),
-            createdBy = row[6] as? String
+            id = getId(),
+            story = Story(id = getStoryId()),
+            languageCode = getLanguageCode(),
+            title = getTitle(),
+            content = getContent(),
+            createdAt = getCreatedAt(),
+            createdBy = getCreatedBy()
         )
     }
 }

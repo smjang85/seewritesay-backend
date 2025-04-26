@@ -1,6 +1,8 @@
 package org.lena.domain.story.entity
 
 import jakarta.persistence.*
+import org.lena.domain.story.converter.StoryTypeConverter
+import org.lena.domain.story.enums.StoryType
 import java.time.LocalDateTime
 
 @Entity
@@ -12,6 +14,13 @@ class Story(
 
     @Column(name = "image_path")
     var imagePath: String? = null,
+
+    @Column(name = "target_age_group")
+    var targetAgeGroup: String? = null,
+
+    @Column(name = "type", nullable = false, length = 1)
+    @Convert(converter = StoryTypeConverter::class)
+    var type: StoryType = StoryType.SHORT,
 
     @Column(name = "created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),

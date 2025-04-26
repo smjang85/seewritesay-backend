@@ -12,6 +12,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        hibernate.format_sql: true
         ddl-auto: update
         globally_quoted_identifiers: true
         jdbc:

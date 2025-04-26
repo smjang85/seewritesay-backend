@@ -7,7 +7,8 @@ import org.lena.domain.story.enums.LanguageCode
 
 interface StoryService {
     fun getAllStories(language: LanguageCode): List<StoryListResponseDto>
-    fun getStoryById(id: Long, language: LanguageCode): StoryResponseDto
+    fun getStoriesByType(language: LanguageCode, type: String): List<StoryListResponseDto>
+    fun getStoryById(id: Long, language: LanguageCode, chapterId: Long?): StoryResponseDto
     fun saveMixedLanguageStory(id: Long, code: String): StoryResponseDto
     fun saveStory(story: Story): Story
 }
